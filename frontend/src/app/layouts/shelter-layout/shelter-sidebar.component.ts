@@ -47,11 +47,16 @@ import { AuthService } from '../../core/auth/auth.service';
           <mat-icon class="sidebar__chevron">chevron_right</mat-icon>
         </a>
 
-        <button type="button" class="sidebar__link sidebar__link--soon" disabled>
+        <a
+          routerLink="/abrigo/pedidos"
+          routerLinkActive="sidebar__link--active"
+          class="sidebar__link"
+          (click)="navClick.emit()"
+        >
           <span class="sidebar__link-icon"><mat-icon>assignment</mat-icon></span>
           <span class="sidebar__link-text">Pedidos</span>
-          <span class="sidebar__soon">Em breve</span>
-        </button>
+          <mat-icon class="sidebar__chevron">chevron_right</mat-icon>
+        </a>
 
         <a
           routerLink="/abrigo/perfil"

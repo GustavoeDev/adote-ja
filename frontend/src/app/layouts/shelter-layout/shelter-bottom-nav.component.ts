@@ -20,10 +20,14 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         <mat-icon>pets</mat-icon>
         <span>Animais</span>
       </a>
-      <button type="button" class="bottom-nav__item bottom-nav__item--disabled" disabled title="Em breve">
+      <a
+        routerLink="/abrigo/pedidos"
+        routerLinkActive="bottom-nav__item--active"
+        class="bottom-nav__item"
+      >
         <mat-icon>assignment</mat-icon>
         <span>Pedidos</span>
-      </button>
+      </a>
       <a routerLink="/abrigo/perfil" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
         <mat-icon>home_work</mat-icon>
         <span>Perfil</span>
@@ -73,11 +77,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 
     .bottom-nav__item--active {
       color: var(--adoteja-primary);
-    }
-
-    .bottom-nav__item--disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
     }
 
     @media (min-width: 768px) {

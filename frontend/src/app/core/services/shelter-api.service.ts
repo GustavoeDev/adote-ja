@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { AdoptionRequest, AdoptionRequestStatus } from '../models/adoption.model';
 import {
   Animal,
   AnimalDetail,
@@ -77,5 +78,22 @@ export class ShelterApiService {
       `${this.apiUrl}/animals/${animalId}/media/${mediaId}/cover/`,
       {},
     );
+  }
+
+  listRequests(status?: AdoptionRequestStatus): Observable<AdoptionRequest[]> {
+    const params = status ? `?status=${status}` : '';
+    return this.http.get<AdoptionRequest[]>(`${this.apiUrl}/shelter/requests/${params}`);
+  }
+
+  getRequest(id: number): Observable<AdoptionRequest> {
+    return this.http.get<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/`);
+  }
+
+  approveRequest(id: number): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/approve/`, {});
+  }
+
+  rejectRequest(id: number): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/reject/`, {});
   }
 }

@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from accounts.permissions import IsShelter
 from accounts.serializers import ShelterProfileSerializer
+from adoptions.models import AdoptionRequest
 from animals.models import Animal
 
 
@@ -15,12 +16,13 @@ class ShelterDashboardView(APIView):
     def get(self, request):
         profile = request.user.shelter_profile
         animals = Animal.objects.filter(shelter=profile, is_active=True)
+        requests_count = AdoptionRequest.objects.filter(animal__shelter=profile).count()
         return Response({
             'shelter_name': profile.name,
             'total_animals': animals.count(),
             'available': animals.filter(status=Animal.Status.AVAILABLE).count(),
             'in_process': animals.filter(status=Animal.Status.IN_PROCESS).count(),
-            'requests_count': 0,
+            'requests_count': requests_count,
         })
 
 

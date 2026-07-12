@@ -56,6 +56,13 @@ export const routes: Routes = [
             (m) => m.ShelterProfileComponent,
           ),
       },
+      {
+        path: 'pedidos',
+        loadComponent: () =>
+          import('./features/shelter/requests/shelter-requests.component').then(
+            (m) => m.ShelterRequestsComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'login' },
