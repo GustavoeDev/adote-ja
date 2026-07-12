@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { guestGuard } from './core/auth/auth.guard';
+import { authGuard, guestGuard, shelterGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -13,6 +13,22 @@ export const routes: Routes = [
     path: 'cadastro',
     loadComponent: () => import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
     canActivate: [guestGuard],
+  },
+  {
+    path: 'abrigo',
+    canActivate: [authGuard, shelterGuard],
+    loadComponent: () =>
+      import('./layouts/shelter-layout/shelter-layout.component').then((m) => m.ShelterLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/shelter/dashboard/shelter-dashboard.component').then(
+            (m) => m.ShelterDashboardComponent,
+          ),
+      },
+    ],
   },
   { path: '**', redirectTo: 'login' },
 ];

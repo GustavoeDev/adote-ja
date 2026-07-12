@@ -1,0 +1,110 @@
+<div class="dashboard" (click)="closeMenu()">
+  <header class="dashboard__header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="dashboard__subtitle">{{ dashboard()?.shelter_name || auth.shelterName() }}</p>
+    </div>
+    <button mat-stroked-button type="button" class="dashboard__logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Sair
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="dashboard__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <section class="metrics" aria-label="Métricas">
+      <div class="metric-card">
+        <div class="metric-card__icon metric-card__icon--primary">
+          <mat-icon>pets</mat-icon>
+        </div>
+        <p class="metric-card__value">{{ dashboard()?.total_animals ?? 0 }}</p>
+        <p class="metric-card__label">Total de Animais</p>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon metric-card__icon--green">
+          <mat-icon>favorite</mat-icon>
+        </div>
+        <p class="metric-card__value">{{ dashboard()?.available ?? 0 }}</p>
+        <p class="metric-card__label">Em Adoção</p>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon metric-card__icon--amber">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <p class="metric-card__value">{{ dashboard()?.in_process ?? 0 }}</p>
+        <p class="metric-card__label">Em Processo</p>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon metric-card__icon--blue">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <p class="metric-card__value">{{ dashboard()?.requests_count ?? 0 }}</p>
+        <p class="metric-card__label">Pedidos</p>
+      </div>
+    </section>
+
+    <section class="animals">
+      <div class="animals__header">
+        <h2>Meus Animais</h2>
+      </div>
+
+      @if (animals().length === 0) {
+        <div class="animals__empty surface-card">
+          <mat-icon>pets</mat-icon>
+          <p>Nenhum animal cadastrado ainda.</p>
+        </div>
+      } @else {
+        <ul class="animals__list">
+          @for (animal of animals(); track animal.id) {
+            <li class="animal-row">
+              <div class="animal-row__thumb">
+                @if (animal.cover_photo_url) {
+                  <img [src]="animal.cover_photo_url" [alt]="animal.name" />
+                } @else {
+                  <mat-icon>pets</mat-icon>
+                }
+              </div>
+              <div class="animal-row__info">
+                <div class="animal-row__title">
+                  <span class="animal-row__name">{{ animal.name }}</span>
+                  <app-status-badge [status]="animal.status" />
+                </div>
+                <p class="animal-row__meta">
+                  {{ animal.breed || 'Sem raça' }}
+                  @if (animal.age_text) {
+                    · {{ animal.age_text }}
+                  }
+                </p>
+              </div>
+              <div class="animal-row__menu" (click)="$event.stopPropagation()">
+                <button
+                  type="button"
+                  class="animal-row__menu-btn"
+                  [attr.aria-expanded]="openMenuId() === animal.id"
+                  (click)="toggleMenu(animal.id, $event)"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                @if (openMenuId() === animal.id) {
+                  <div class="animal-row__dropdown">
+                    <button type="button" class="animal-row__dropdown-item animal-row__dropdown-item--danger" (click)="confirmInactivate(animal)">
+                      <mat-icon>block</mat-icon>
+                      Inativar
+                    </button>
+                  </div>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <button type="button" class="fab" aria-label="Novo animal" (click)="onFabClick()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
