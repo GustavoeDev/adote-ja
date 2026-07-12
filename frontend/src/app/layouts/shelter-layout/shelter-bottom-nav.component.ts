@@ -12,6 +12,14 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
       </a>
+      <a
+        routerLink="/abrigo/animais"
+        routerLinkActive="bottom-nav__item--active"
+        class="bottom-nav__item"
+      >
+        <mat-icon>pets</mat-icon>
+        <span>Animais</span>
+      </a>
       <button type="button" class="bottom-nav__item bottom-nav__item--disabled" disabled title="Em breve">
         <mat-icon>assignment</mat-icon>
         <span>Pedidos</span>
@@ -50,7 +58,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       background: transparent;
       color: var(--adoteja-text-muted);
       text-decoration: none;
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
@@ -58,9 +66,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     }
 
     .bottom-nav__item mat-icon {
-      font-size: 1.375rem;
-      width: 1.375rem;
-      height: 1.375rem;
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
     }
 
     .bottom-nav__item--active {

@@ -49,6 +49,12 @@
     <section class="animals">
       <div class="animals__header">
         <h2>Meus Animais</h2>
+        @if (animals().length > 0) {
+          <a routerLink="/abrigo/animais" class="animals__see-all">
+            Ver mais
+            <mat-icon>chevron_right</mat-icon>
+          </a>
+        }
       </div>
 
       @if (animals().length === 0) {
@@ -58,7 +64,7 @@
         </div>
       } @else {
         <ul class="animals__list">
-          @for (animal of animals(); track animal.id) {
+          @for (animal of previewAnimals(); track animal.id) {
             <li class="animal-row">
               <div class="animal-row__thumb">
                 @if (animal.cover_photo_url) {
@@ -90,6 +96,10 @@
                 </button>
                 @if (openMenuId() === animal.id) {
                   <div class="animal-row__dropdown">
+                    <button type="button" class="animal-row__dropdown-item" (click)="editAnimal(animal)">
+                      <mat-icon>edit</mat-icon>
+                      Editar
+                    </button>
                     <button type="button" class="animal-row__dropdown-item animal-row__dropdown-item--danger" (click)="confirmInactivate(animal)">
                       <mat-icon>block</mat-icon>
                       Inativar
@@ -100,6 +110,13 @@
             </li>
           }
         </ul>
+
+        @if (hasMoreAnimals()) {
+          <a routerLink="/abrigo/animais" class="animals__more-btn">
+            Ver todos os {{ animals().length }} animais
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        }
       }
     </section>
   }

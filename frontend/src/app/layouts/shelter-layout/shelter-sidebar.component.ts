@@ -47,6 +47,17 @@ import { AuthService } from '../../core/auth/auth.service';
           <mat-icon class="sidebar__chevron">chevron_right</mat-icon>
         </a>
 
+        <a
+          routerLink="/abrigo/animais"
+          routerLinkActive="sidebar__link--active"
+          class="sidebar__link"
+          (click)="navClick.emit()"
+        >
+          <span class="sidebar__link-icon"><mat-icon>pets</mat-icon></span>
+          <span class="sidebar__link-text">Animais</span>
+          <mat-icon class="sidebar__chevron">chevron_right</mat-icon>
+        </a>
+
         <button type="button" class="sidebar__link sidebar__link--soon" disabled>
           <span class="sidebar__link-icon"><mat-icon>assignment</mat-icon></span>
           <span class="sidebar__link-text">Pedidos</span>

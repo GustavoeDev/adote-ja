@@ -1,0 +1,87 @@
+<div class="uploader">
+  <p class="uploader__label">Fotos e vídeos</p>
+
+  <div
+    class="uploader__dropzone"
+    [class.uploader__dropzone--active]="dragging()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="fileInput.click()"
+  >
+    <mat-icon>{{ dragging() ? 'file_download' : 'cloud_upload' }}</mat-icon>
+    <p class="uploader__drop-title">
+      {{ dragging() ? 'Solte os arquivos aqui' : 'Arraste ou toque para selecionar' }}
+    </p>
+    <p class="uploader__drop-hint">PNG, JPG, WEBP, MP4, WEBM · máx. 10MB</p>
+    <input
+      #fileInput
+      type="file"
+      accept="image/*,video/*"
+      multiple
+      hidden
+      (change)="onFileInput($event)"
+    />
+  </div>
+
+  @if (existingMedia().length || pendingFiles().length) {
+    <div class="uploader__grid">
+      @for (media of existingMedia(); track media.id) {
+        <div class="thumb" [class.thumb--cover]="media.is_cover">
+          @if (isPhoto(media.media_type)) {
+            <img [src]="media.file_url" [alt]="'Mídia ' + media.id" />
+          } @else {
+            <video [src]="media.file_url" controls preload="metadata"></video>
+            <span class="thumb__video-badge">
+              <mat-icon>videocam</mat-icon>
+            </span>
+          }
+          <button
+            type="button"
+            class="thumb__remove"
+            aria-label="Remover mídia"
+            (click)="existingRemoved.emit(media.id); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          @if (media.is_cover) {
+            <span class="thumb__cover-label">Capa</span>
+          } @else if (isPhoto(media.media_type)) {
+            <button
+              type="button"
+              class="thumb__set-cover"
+              (click)="coverSelected.emit(media.id); $event.stopPropagation()"
+            >
+              Definir capa
+            </button>
+          }
+        </div>
+      }
+
+      @for (pending of pendingFiles(); track pending.id) {
+        <div class="thumb thumb--pending">
+          @if (isPhoto(pending.mediaType)) {
+            <img [src]="pending.previewUrl" [alt]="pending.file.name" />
+          } @else {
+            <video [src]="pending.previewUrl" controls preload="metadata"></video>
+            <span class="thumb__video-badge">
+              <mat-icon>videocam</mat-icon>
+            </span>
+          }
+          <button
+            type="button"
+            class="thumb__remove"
+            aria-label="Remover arquivo"
+            (click)="pendingRemoved.emit(pending.id); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <span class="thumb__pending-label">Novo</span>
+        </div>
+      }
+    </div>
+  }
+</div>

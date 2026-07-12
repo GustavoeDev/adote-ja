@@ -28,6 +28,27 @@ export const routes: Routes = [
             (m) => m.ShelterDashboardComponent,
           ),
       },
+      {
+        path: 'animais',
+        loadComponent: () =>
+          import('./features/shelter/animals-list/animals-list.component').then(
+            (m) => m.AnimalsListComponent,
+          ),
+      },
+      {
+        path: 'animais/novo',
+        loadComponent: () =>
+          import('./features/shelter/animal-form/animal-form.component').then(
+            (m) => m.AnimalFormComponent,
+          ),
+      },
+      {
+        path: 'animais/:id/editar',
+        loadComponent: () =>
+          import('./features/shelter/animal-form/animal-form.component').then(
+            (m) => m.AnimalFormComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'login' },

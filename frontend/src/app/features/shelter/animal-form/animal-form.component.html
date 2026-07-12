@@ -1,0 +1,139 @@
+<div class="animal-form">
+  <header class="animal-form__header">
+    <a routerLink="/abrigo/dashboard" class="animal-form__back" aria-label="Voltar">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <div>
+      <h1>{{ isEdit ? 'Editar Animal' : 'Novo Animal' }}</h1>
+      <p>Preencha as informações do animal</p>
+    </div>
+  </header>
+
+  @if (loadingAnimal()) {
+    <div class="animal-form__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <form class="animal-form__body" [formGroup]="form" (ngSubmit)="submit()">
+      <app-media-uploader
+        [existingMedia]="existingMedia()"
+        [pendingFiles]="pendingFiles()"
+        (filesAdded)="onFilesAdded($event)"
+        (pendingRemoved)="onPendingRemoved($event)"
+        (existingRemoved)="onExistingRemoved($event)"
+        (coverSelected)="onCoverSelected($event)"
+      />
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nome do animal</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Bolinha" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="field-block">
+        <p class="field-block__label">Espécie *</p>
+        <div class="species-grid">
+          @for (opt of speciesOptions; track opt.id) {
+            <button
+              type="button"
+              class="species-btn"
+              [class.species-btn--active]="species() === opt.id"
+              (click)="setSpecies(opt.id)"
+            >
+              <mat-icon>{{ opt.icon }}</mat-icon>
+              <span>{{ opt.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="row-2">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Raça</mat-label>
+          <input matInput formControlName="breed" placeholder="Golden Retriever" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Idade</mat-label>
+          <input matInput formControlName="age_text" placeholder="2 anos" />
+        </mat-form-field>
+      </div>
+
+      <div class="row-2">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Peso</mat-label>
+          <input matInput formControlName="weight" placeholder="12 kg" />
+        </mat-form-field>
+        <div class="field-block">
+          <p class="field-block__label">Porte</p>
+          <div class="size-row">
+            @for (opt of sizeOptions; track opt.id) {
+              <button
+                type="button"
+                class="size-btn"
+                [class.size-btn--active]="size() === opt.id"
+                (click)="setSize(opt.id)"
+              >
+                {{ opt.label }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descrição</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="4"
+          placeholder="Personalidade, histórico, necessidades especiais..."
+        ></textarea>
+      </mat-form-field>
+
+      <div class="toggles">
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.toggle-btn--active]="vaccinated()"
+          (click)="toggleVaccinated()"
+        >
+          <div class="toggle-btn__content">
+            <mat-icon>vaccines</mat-icon>
+            Vacinado
+          </div>
+          @if (vaccinated()) {
+            <mat-icon class="toggle-btn__check">check</mat-icon>
+          }
+        </button>
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.toggle-btn--active]="neutered()"
+          (click)="toggleNeutered()"
+        >
+          <mat-icon>health_and_safety</mat-icon>
+          Castrado
+          @if (neutered()) {
+            <mat-icon class="toggle-btn__check">check</mat-icon>
+          }
+        </button>
+      </div>
+
+      <div class="animal-form__actions">
+        <button
+          type="submit"
+          class="animal-form__submit"
+          [disabled]="loading()"
+        >
+          @if (loading()) {
+            <mat-spinner diameter="22"></mat-spinner>
+          } @else {
+            {{ isEdit ? 'Salvar alterações' : 'Cadastrar animal' }}
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

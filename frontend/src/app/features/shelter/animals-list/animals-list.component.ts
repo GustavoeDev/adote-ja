@@ -4,19 +4,17 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
 
-import { AuthService } from '../../../core/auth/auth.service';
-import { Animal, ShelterDashboard } from '../../../core/models/animal.model';
+import { Animal, AnimalSpecies } from '../../../core/models/animal.model';
 import { ShelterApiService } from '../../../core/services/shelter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { ConfirmInactivateDialogComponent } from './confirm-inactivate-dialog.component';
+import { ConfirmInactivateDialogComponent } from '../dashboard/confirm-inactivate-dialog.component';
 
-const DASHBOARD_ANIMALS_PREVIEW = 5;
+type SpeciesFilter = 'all' | AnimalSpecies;
 
 @Component({
-  selector: 'app-shelter-dashboard',
+  selector: 'app-animals-list',
   standalone: true,
   imports: [
     MatButtonModule,
@@ -25,25 +23,46 @@ const DASHBOARD_ANIMALS_PREVIEW = 5;
     MatProgressSpinnerModule,
     MatSnackBarModule,
     StatusBadgeComponent,
-    RouterLink,
   ],
-  templateUrl: './shelter-dashboard.component.html',
-  styleUrl: './shelter-dashboard.component.scss',
+  templateUrl: './animals-list.component.html',
+  styleUrl: './animals-list.component.scss',
 })
-export class ShelterDashboardComponent implements OnInit {
+export class AnimalsListComponent implements OnInit {
   private readonly api = inject(ShelterApiService);
-  readonly auth = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
 
   readonly loading = signal(true);
-  readonly dashboard = signal<ShelterDashboard | null>(null);
   readonly animals = signal<Animal[]>([]);
+  readonly filter = signal<SpeciesFilter>('all');
   readonly openMenuId = signal<number | null>(null);
 
-  readonly previewAnimals = computed(() => this.animals().slice(0, DASHBOARD_ANIMALS_PREVIEW));
-  readonly hasMoreAnimals = computed(() => this.animals().length > DASHBOARD_ANIMALS_PREVIEW);
+  readonly filters: { id: SpeciesFilter; label: string; icon: string }[] = [
+    { id: 'all', label: 'Todos', icon: 'apps' },
+    { id: 'dog', label: 'Cães', icon: 'pets' },
+    { id: 'cat', label: 'Gatos', icon: 'cruelty_free' },
+    { id: 'rabbit', label: 'Coelhos', icon: 'emoji_nature' },
+    { id: 'other', label: 'Outros', icon: 'spa' },
+  ];
+
+  readonly filteredAnimals = computed(() => {
+    const current = this.filter();
+    const list = this.animals();
+    if (current === 'all') return list;
+    return list.filter((a) => a.species === current);
+  });
+
+  readonly counts = computed(() => {
+    const list = this.animals();
+    return {
+      all: list.length,
+      dog: list.filter((a) => a.species === 'dog').length,
+      cat: list.filter((a) => a.species === 'cat').length,
+      rabbit: list.filter((a) => a.species === 'rabbit').length,
+      other: list.filter((a) => a.species === 'other').length,
+    };
+  });
 
   ngOnInit(): void {
     this.load();
@@ -51,23 +70,28 @@ export class ShelterDashboardComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    forkJoin({
-      dashboard: this.api.getDashboard(),
-      animals: this.api.listAnimals(),
-    }).subscribe({
-      next: ({ dashboard, animals }) => {
-        this.dashboard.set(dashboard);
+    this.api.listAnimals().subscribe({
+      next: (animals) => {
         this.animals.set(animals);
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Não foi possível carregar o dashboard.', 'Fechar', {
+        this.snackBar.open('Não foi possível carregar os animais.', 'Fechar', {
           duration: 4000,
           panelClass: 'snackbar-error',
         });
       },
     });
+  }
+
+  setFilter(value: SpeciesFilter): void {
+    this.filter.set(value);
+    this.closeMenu();
+  }
+
+  countFor(id: SpeciesFilter): number {
+    return this.counts()[id];
   }
 
   toggleMenu(id: number, event: Event): void {
@@ -77,6 +101,11 @@ export class ShelterDashboardComponent implements OnInit {
 
   closeMenu(): void {
     this.openMenuId.set(null);
+  }
+
+  editAnimal(animal: Animal): void {
+    this.closeMenu();
+    void this.router.navigate(['/abrigo/animais', animal.id, 'editar']);
   }
 
   confirmInactivate(animal: Animal): void {
@@ -107,14 +136,5 @@ export class ShelterDashboardComponent implements OnInit {
 
   onFabClick(): void {
     void this.router.navigate(['/abrigo/animais/novo']);
-  }
-
-  editAnimal(animal: Animal): void {
-    this.closeMenu();
-    void this.router.navigate(['/abrigo/animais', animal.id, 'editar']);
-  }
-
-  logout(): void {
-    this.auth.logout().subscribe(() => void this.router.navigate(['/login']));
   }
 }

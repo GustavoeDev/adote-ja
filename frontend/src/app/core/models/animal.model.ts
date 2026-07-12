@@ -1,6 +1,15 @@
 export type AnimalStatus = 'available' | 'in_process' | 'adopted';
 export type AnimalSpecies = 'dog' | 'cat' | 'rabbit' | 'other';
 export type AnimalSize = 'small' | 'medium' | 'large';
+export type MediaType = 'photo' | 'video';
+
+export interface AnimalMedia {
+  id: number;
+  file_url: string;
+  media_type: MediaType;
+  is_cover: boolean;
+  order: number;
+}
 
 export interface Animal {
   id: number;
@@ -17,10 +26,42 @@ export interface Animal {
   is_active: boolean;
 }
 
+export interface AnimalDetail extends Animal {
+  age_months: number | null;
+  description: string;
+  vaccinated: boolean;
+  neutered: boolean;
+  media: AnimalMedia[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnimalWritePayload {
+  name: string;
+  species: AnimalSpecies;
+  breed?: string;
+  age_text?: string;
+  age_months?: number | null;
+  weight?: string;
+  size?: AnimalSize | '';
+  description?: string;
+  vaccinated?: boolean;
+  neutered?: boolean;
+  city?: string;
+  status?: AnimalStatus;
+}
+
 export interface ShelterDashboard {
   shelter_name: string;
   total_animals: number;
   available: number;
   in_process: number;
   requests_count: number;
+}
+
+export interface PendingMediaFile {
+  id: string;
+  file: File;
+  previewUrl: string;
+  mediaType: MediaType;
 }
