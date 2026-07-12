@@ -89,11 +89,34 @@ export class ShelterApiService {
     return this.http.get<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/`);
   }
 
+  scheduleInterview(id: number): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(
+      `${this.apiUrl}/shelter/requests/${id}/schedule-interview/`,
+      {},
+    );
+  }
+
+  startInterview(id: number): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(
+      `${this.apiUrl}/shelter/requests/${id}/start-interview/`,
+      {},
+    );
+  }
+
+  completeInterview(id: number): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(
+      `${this.apiUrl}/shelter/requests/${id}/complete-interview/`,
+      {},
+    );
+  }
+
   approveRequest(id: number): Observable<AdoptionRequest> {
     return this.http.post<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/approve/`, {});
   }
 
-  rejectRequest(id: number): Observable<AdoptionRequest> {
-    return this.http.post<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/reject/`, {});
+  rejectRequest(id: number, reason: string): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(`${this.apiUrl}/shelter/requests/${id}/reject/`, {
+      reason,
+    });
   }
 }

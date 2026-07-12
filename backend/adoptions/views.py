@@ -8,6 +8,30 @@ from adoptions.models import AdoptionRequest
 from adoptions.serializers import AdoptionRequestSerializer
 
 
+def get_shelter_request(request, pk):
+    profile = request.user.shelter_profile
+    try:
+        return (
+            AdoptionRequest.objects
+            .filter(animal__shelter=profile)
+            .select_related('animal', 'adopter')
+            .prefetch_related('animal__media', 'timeline_events')
+            .get(pk=pk)
+        )
+    except AdoptionRequest.DoesNotExist:
+        return None
+
+
+def serialize_request(obj, request):
+    obj = (
+        AdoptionRequest.objects
+        .select_related('animal', 'adopter')
+        .prefetch_related('animal__media', 'timeline_events')
+        .get(pk=obj.pk)
+    )
+    return AdoptionRequestSerializer(obj, context={'request': request}).data
+
+
 class ShelterAdoptionRequestListView(APIView):
     permission_classes = [IsAuthenticated, IsShelter]
 
@@ -21,11 +45,7 @@ class ShelterAdoptionRequestListView(APIView):
         )
 
         status_filter = request.query_params.get('status')
-        if status_filter in {
-            AdoptionRequest.Status.PENDING,
-            AdoptionRequest.Status.APPROVED,
-            AdoptionRequest.Status.REJECTED,
-        }:
+        if status_filter in {choice.value for choice in AdoptionRequest.Status}:
             qs = qs.filter(status=status_filter)
 
         serializer = AdoptionRequestSerializer(qs, many=True, context={'request': request})
@@ -35,86 +55,81 @@ class ShelterAdoptionRequestListView(APIView):
 class ShelterAdoptionRequestDetailView(APIView):
     permission_classes = [IsAuthenticated, IsShelter]
 
-    def get_object(self, request, pk):
-        profile = request.user.shelter_profile
-        try:
-            return (
-                AdoptionRequest.objects
-                .filter(animal__shelter=profile)
-                .select_related('animal', 'adopter')
-                .prefetch_related('animal__media', 'timeline_events')
-                .get(pk=pk)
-            )
-        except AdoptionRequest.DoesNotExist:
-            return None
-
     def get(self, request, pk):
-        obj = self.get_object(request, pk)
+        obj = get_shelter_request(request, pk)
         if not obj:
             return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
         return Response(AdoptionRequestSerializer(obj, context={'request': request}).data)
+
+
+class ShelterAdoptionRequestScheduleInterviewView(APIView):
+    permission_classes = [IsAuthenticated, IsShelter]
+
+    def post(self, request, pk):
+        obj = get_shelter_request(request, pk)
+        if not obj:
+            return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            obj.mark_interview_scheduled()
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))
+
+
+class ShelterAdoptionRequestStartInterviewView(APIView):
+    """Avança de 'Entrevista agendada' (verde) para 'Realizar entrevista' (amarelo)."""
+
+    permission_classes = [IsAuthenticated, IsShelter]
+
+    def post(self, request, pk):
+        obj = get_shelter_request(request, pk)
+        if not obj:
+            return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            obj.advance_to_perform_interview()
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))
+
+
+class ShelterAdoptionRequestCompleteInterviewView(APIView):
+    permission_classes = [IsAuthenticated, IsShelter]
+
+    def post(self, request, pk):
+        obj = get_shelter_request(request, pk)
+        if not obj:
+            return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            obj.mark_interview_completed()
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))
 
 
 class ShelterAdoptionRequestApproveView(APIView):
     permission_classes = [IsAuthenticated, IsShelter]
 
     def post(self, request, pk):
-        profile = request.user.shelter_profile
-        try:
-            obj = (
-                AdoptionRequest.objects
-                .filter(animal__shelter=profile)
-                .select_related('animal')
-                .prefetch_related('animal__media', 'timeline_events')
-                .get(pk=pk)
-            )
-        except AdoptionRequest.DoesNotExist:
+        obj = get_shelter_request(request, pk)
+        if not obj:
             return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
-
-        if obj.status != AdoptionRequest.Status.PENDING:
-            return Response(
-                {'detail': 'Somente solicitações pendentes podem ser aprovadas.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        obj.mark_approved()
-        obj.refresh_from_db()
-        obj = (
-            AdoptionRequest.objects
-            .select_related('animal')
-            .prefetch_related('animal__media', 'timeline_events')
-            .get(pk=obj.pk)
-        )
-        return Response(AdoptionRequestSerializer(obj, context={'request': request}).data)
+        try:
+            obj.mark_approved()
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))
 
 
 class ShelterAdoptionRequestRejectView(APIView):
     permission_classes = [IsAuthenticated, IsShelter]
 
     def post(self, request, pk):
-        profile = request.user.shelter_profile
-        try:
-            obj = (
-                AdoptionRequest.objects
-                .filter(animal__shelter=profile)
-                .select_related('animal')
-                .prefetch_related('animal__media', 'timeline_events')
-                .get(pk=pk)
-            )
-        except AdoptionRequest.DoesNotExist:
+        obj = get_shelter_request(request, pk)
+        if not obj:
             return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
-
-        if obj.status != AdoptionRequest.Status.PENDING:
-            return Response(
-                {'detail': 'Somente solicitações pendentes podem ser recusadas.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        obj.mark_rejected()
-        obj = (
-            AdoptionRequest.objects
-            .select_related('animal')
-            .prefetch_related('animal__media', 'timeline_events')
-            .get(pk=obj.pk)
-        )
-        return Response(AdoptionRequestSerializer(obj, context={'request': request}).data)
+        reason = request.data.get('reason', '')
+        try:
+            obj.mark_rejected(reason)
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))

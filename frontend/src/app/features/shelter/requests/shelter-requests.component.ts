@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -9,19 +10,27 @@ import {
   AdoptionRequestStatus,
 } from '../../../core/models/adoption.model';
 import { ShelterApiService } from '../../../core/services/shelter-api.service';
+import { RejectRequestDialogComponent } from './reject-request-dialog.component';
 
 type RequestFilter = 'all' | AdoptionRequestStatus;
 
 @Component({
   selector: 'app-shelter-requests',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatSnackBarModule],
+  imports: [
+    MatButtonModule,
+    MatDialogModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+  ],
   templateUrl: './shelter-requests.component.html',
   styleUrl: './shelter-requests.component.scss',
 })
 export class ShelterRequestsComponent implements OnInit {
   private readonly api = inject(ShelterApiService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   readonly loading = signal(true);
   readonly acting = signal(false);
@@ -32,14 +41,26 @@ export class ShelterRequestsComponent implements OnInit {
   readonly filters: { id: RequestFilter; label: string }[] = [
     { id: 'all', label: 'Todos' },
     { id: 'pending', label: 'Pendentes' },
+    { id: 'in_progress', label: 'Em andamento' },
     { id: 'approved', label: 'Aprovados' },
     { id: 'rejected', label: 'Recusados' },
   ];
 
+  private readonly statusOrder: Record<AdoptionRequestStatus, number> = {
+    pending: 0,
+    in_progress: 1,
+    approved: 2,
+    rejected: 3,
+  };
+
   readonly filteredRequests = computed(() => {
     const current = this.filter();
     const list = this.requests();
-    if (current === 'all') return list;
+    if (current === 'all') {
+      return [...list].sort(
+        (a, b) => this.statusOrder[a.status] - this.statusOrder[b.status],
+      );
+    }
     return list.filter((r) => r.status === current);
   });
 
@@ -48,6 +69,7 @@ export class ShelterRequestsComponent implements OnInit {
     return {
       all: list.length,
       pending: list.filter((r) => r.status === 'pending').length,
+      in_progress: list.filter((r) => r.status === 'in_progress').length,
       approved: list.filter((r) => r.status === 'approved').length,
       rejected: list.filter((r) => r.status === 'rejected').length,
     };
@@ -93,45 +115,121 @@ export class ShelterRequestsComponent implements OnInit {
   statusLabel(status: AdoptionRequestStatus): string {
     const map: Record<AdoptionRequestStatus, string> = {
       pending: 'Pendente',
+      in_progress: 'Em andamento',
       approved: 'Aprovado',
       rejected: 'Recusado',
     };
     return map[status];
   }
 
-  approve(): void {
+  openWhatsApp(url: string): void {
+    window.open(url, '_blank', 'noopener');
+  }
+
+  scheduleInterview(): void {
     const request = this.selected();
     if (!request || this.acting()) return;
     this.acting.set(true);
-    this.api.approveRequest(request.id).subscribe({
+    this.api.scheduleInterview(request.id).subscribe({
       next: (updated) => {
         this.acting.set(false);
         this.patchRequest(updated);
         this.selected.set(updated);
-        this.snackBar.open('Pedido aprovado!', 'Fechar', { duration: 3000 });
+        this.snackBar.open('Entrevista agendada!', 'Fechar', { duration: 2500 });
+        // Após o verde "Entrevista agendada", avança para amarelo "Realizar entrevista".
+        window.setTimeout(() => this.startInterview(updated.id), 1100);
       },
-      error: () => {
+      error: (err) => {
         this.acting.set(false);
-        this.snackBar.open('Não foi possível aprovar o pedido.', 'Fechar', { duration: 4000 });
+        this.showError(err, 'Não foi possível confirmar o agendamento.');
       },
     });
+  }
+
+  startInterview(id?: number): void {
+    const requestId = id ?? this.selected()?.id;
+    if (!requestId || this.acting()) return;
+    this.acting.set(true);
+    this.api.startInterview(requestId).subscribe({
+      next: (updated) => {
+        this.acting.set(false);
+        this.patchRequest(updated);
+        this.selected.set(updated);
+      },
+      error: (err) => {
+        this.acting.set(false);
+        this.showError(err, 'Não foi possível avançar para a realização da entrevista.');
+      },
+    });
+  }
+
+  completeInterview(): void {
+    const request = this.selected();
+    if (!request || this.acting()) return;
+    this.runAction(
+      this.api.completeInterview(request.id),
+      'Entrevista marcada como realizada.',
+      'Não foi possível atualizar a entrevista.',
+    );
+  }
+
+  approve(): void {
+    const request = this.selected();
+    if (!request || this.acting()) return;
+    this.runAction(
+      this.api.approveRequest(request.id),
+      'Pedido aprovado!',
+      'Não foi possível aprovar o pedido.',
+    );
   }
 
   reject(): void {
     const request = this.selected();
     if (!request || this.acting()) return;
+
+    const ref = this.dialog.open(RejectRequestDialogComponent, {
+      width: '26rem',
+      maxWidth: '95vw',
+      data: {
+        adopterName: request.adopter_name,
+        animalName: request.animal_name,
+      },
+    });
+
+    ref.afterClosed().subscribe((reason?: string) => {
+      if (!reason) return;
+      this.runAction(
+        this.api.rejectRequest(request.id, reason),
+        'Pedido recusado.',
+        'Não foi possível recusar o pedido.',
+      );
+    });
+  }
+
+  private runAction(
+    request$: ReturnType<ShelterApiService['approveRequest']>,
+    successMessage: string,
+    errorMessage: string,
+  ): void {
     this.acting.set(true);
-    this.api.rejectRequest(request.id).subscribe({
+    request$.subscribe({
       next: (updated) => {
         this.acting.set(false);
         this.patchRequest(updated);
         this.selected.set(updated);
-        this.snackBar.open('Pedido recusado.', 'Fechar', { duration: 3000 });
+        this.snackBar.open(successMessage, 'Fechar', { duration: 3000 });
       },
-      error: () => {
+      error: (err) => {
         this.acting.set(false);
-        this.snackBar.open('Não foi possível recusar o pedido.', 'Fechar', { duration: 4000 });
+        this.showError(err, errorMessage);
       },
+    });
+  }
+
+  private showError(err: { error?: { detail?: string } }, fallback: string): void {
+    const detail = err?.error?.detail;
+    this.snackBar.open(typeof detail === 'string' ? detail : fallback, 'Fechar', {
+      duration: 4000,
     });
   }
 

@@ -215,6 +215,11 @@
   color: #d97706;
 }
 
+.status-badge[data-status='in_progress'] {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
 .status-badge[data-status='approved'] {
   background: #ecfdf5;
   color: #059669;
@@ -361,6 +366,12 @@
   color: var(--adoteja-text-muted);
 }
 
+.rejection-reason {
+  margin: 0;
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
 .timeline {
   list-style: none;
   margin: 0;
@@ -436,6 +447,25 @@
   color: var(--adoteja-text-muted);
 }
 
+.detail-step-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.detail-step-actions__hint {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--adoteja-text-muted);
+}
+
+.detail-step-actions button {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
 .detail-actions {
   display: flex;
   gap: 0.5rem;
@@ -450,6 +480,16 @@
 .detail-actions__reject {
   color: #dc2626 !important;
   border-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+.detail-actions__whatsapp {
+  background: #25d366 !important;
+  color: #fff !important;
+}
+
+.detail-actions__whatsapp-outline {
+  color: #128c7e !important;
+  border-color: rgba(18, 140, 126, 0.4) !important;
 }
 
 @keyframes fade-in {

@@ -15,6 +15,8 @@ class AdoptionRequestSerializer(serializers.ModelSerializer):
     animal_photo_url = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
     timeline = TimelineEventSerializer(source='timeline_events', many=True, read_only=True)
+    can_decide = serializers.BooleanField(read_only=True)
+    whatsapp_url = serializers.CharField(read_only=True, allow_null=True)
 
     class Meta:
         model = AdoptionRequest
@@ -24,12 +26,17 @@ class AdoptionRequestSerializer(serializers.ModelSerializer):
             'animal_name',
             'animal_photo_url',
             'status',
+            'interview_phase',
+            'interview_completed',
+            'can_decide',
+            'whatsapp_url',
             'date',
             'adopter_name',
             'adopter_phone',
             'adopter_email',
             'adopter_city',
             'message',
+            'rejection_reason',
             'timeline',
             'created_at',
             'reviewed_at',

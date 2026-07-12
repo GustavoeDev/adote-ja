@@ -53,6 +53,11 @@ class Command(BaseCommand):
                 'age_text': '1 ano', 'age_months': 12, 'weight': '4 kg', 'size': 'small',
                 'status': 'available', 'vaccinated': True, 'neutered': False,
             },
+            {
+                'name': 'Mel', 'species': 'cat', 'breed': 'SRD',
+                'age_text': '8 meses', 'age_months': 8, 'weight': '3 kg', 'size': 'small',
+                'status': 'available', 'vaccinated': True, 'neutered': False,
+            },
         ]
 
         animals = {}
@@ -105,8 +110,18 @@ class Command(BaseCommand):
                 'adopter_phone': '(11) 98765-4321',
                 'adopter_email': 'maria.silva@email.com',
                 'adopter_city': 'São Paulo, SP',
-                'status': AdoptionRequest.Status.PENDING,
+                'stage': 'pending',
                 'created_delta': timedelta(days=1),
+            },
+            {
+                'animal': animals['Mel'],
+                'adopter': ana,
+                'adopter_name': 'Ana Costa',
+                'adopter_phone': '(31) 94567-8901',
+                'adopter_email': 'ana@email.com',
+                'adopter_city': 'Belo Horizonte, MG',
+                'stage': 'in_progress',
+                'created_delta': timedelta(days=4),
             },
             {
                 'animal': animals['Luna'],
@@ -115,8 +130,8 @@ class Command(BaseCommand):
                 'adopter_phone': '(11) 98765-4321',
                 'adopter_email': 'maria.silva@email.com',
                 'adopter_city': 'São Paulo, SP',
-                'status': AdoptionRequest.Status.APPROVED,
-                'created_delta': timedelta(days=9),
+                'stage': 'awaiting_decision',
+                'created_delta': timedelta(days=7),
             },
             {
                 'animal': animals['Thor'],
@@ -125,7 +140,7 @@ class Command(BaseCommand):
                 'adopter_phone': '(31) 94567-8901',
                 'adopter_email': 'ana@email.com',
                 'adopter_city': 'Belo Horizonte, MG',
-                'status': AdoptionRequest.Status.REJECTED,
+                'stage': 'rejected',
                 'created_delta': timedelta(days=13),
             },
         ]
@@ -154,10 +169,24 @@ class Command(BaseCommand):
             req.refresh_from_db()
             req.build_initial_timeline()
 
-            if data['status'] == AdoptionRequest.Status.APPROVED:
+            stage = data['stage']
+            if stage == 'in_progress':
+                req.mark_interview_scheduled()
+                req.advance_to_perform_interview()
+            elif stage == 'awaiting_decision':
+                req.mark_interview_scheduled()
+                req.advance_to_perform_interview()
+                req.mark_interview_completed()
+            elif stage == 'approved':
+                req.mark_interview_scheduled()
+                req.advance_to_perform_interview()
+                req.mark_interview_completed()
                 req.mark_approved()
-            elif data['status'] == AdoptionRequest.Status.REJECTED:
-                req.mark_rejected()
+            elif stage == 'rejected':
+                req.mark_interview_scheduled()
+                req.advance_to_perform_interview()
+                req.mark_interview_completed()
+                req.mark_rejected('O lar informado não oferece condições adequadas para o animal.')
 
         self.stdout.write(self.style.SUCCESS('Dados de demo do abrigo criados.'))
         self.stdout.write('Abrigo: abrigo@adoteja.com / Abrigo123!')

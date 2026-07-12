@@ -41,13 +41,13 @@
             </div>
             <div class="request-card__body">
               <div class="request-card__title">
-                <span class="request-card__name">{{ req.adopter_name }}</span>
+                <span class="request-card__name">{{ req.animal_name }}</span>
                 <span class="status-badge" [attr.data-status]="req.status">
                   {{ statusLabel(req.status) }}
                 </span>
               </div>
               <p class="request-card__meta">
-                Quer adotar: <strong>{{ req.animal_name }}</strong>
+                Adotante: <strong>{{ req.adopter_name }}</strong>
               </p>
               <p class="request-card__date">
                 <mat-icon>calendar_today</mat-icon>
@@ -142,7 +142,91 @@
         </ol>
       </section>
 
-      @if (req.status === 'pending') {
+      @if (req.rejection_reason) {
+        <section class="detail-section">
+          <h3>Motivo da rejeição</h3>
+          <p class="rejection-reason">{{ req.rejection_reason }}</p>
+        </section>
+      }
+
+      @if (req.interview_phase === 'to_schedule') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Entre em contato pelo WhatsApp para combinar a entrevista e, em seguida, confirme o
+            agendamento.
+          </p>
+          @if (req.whatsapp_url) {
+            <button
+              mat-flat-button
+              type="button"
+              class="detail-actions__whatsapp"
+              (click)="openWhatsApp(req.whatsapp_url)"
+            >
+              <mat-icon>chat</mat-icon>
+              Agendar via WhatsApp
+            </button>
+          }
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="scheduleInterview()"
+          >
+            <mat-icon>event_available</mat-icon>
+            Entrevista agendada
+          </button>
+        </div>
+      }
+
+      @if (req.interview_phase === 'scheduled') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Entrevista agendada. Em seguida, registre quando ela for realizada.
+          </p>
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="startInterview()"
+          >
+            <mat-icon>arrow_forward</mat-icon>
+            Ir para realização
+          </button>
+        </div>
+      }
+
+      @if (req.interview_phase === 'to_perform') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Após realizar a entrevista, registre aqui para liberar a decisão final.
+          </p>
+          @if (req.whatsapp_url) {
+            <button
+              mat-stroked-button
+              type="button"
+              class="detail-actions__whatsapp-outline"
+              (click)="openWhatsApp(req.whatsapp_url)"
+            >
+              <mat-icon>chat</mat-icon>
+              WhatsApp do adotante
+            </button>
+          }
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="completeInterview()"
+          >
+            <mat-icon>handshake</mat-icon>
+            Entrevista realizada
+          </button>
+        </div>
+      }
+
+      @if (req.can_decide) {
         <div class="detail-actions">
           <button
             mat-stroked-button
