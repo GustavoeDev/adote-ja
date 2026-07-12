@@ -86,4 +86,10 @@ export class AuthService {
     }
     void this.router.navigate(['/login']);
   }
+
+  patchCurrentUser(partial: Partial<User>): void {
+    const current = this._user();
+    if (!current) return;
+    this._user.set({ ...current, ...partial });
+  }
 }

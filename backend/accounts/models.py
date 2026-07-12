@@ -23,6 +23,7 @@ class ShelterProfile(models.Model):
     )
     name = models.CharField(max_length=150)
     cover_photo = models.ImageField(upload_to='shelters/covers/', blank=True, null=True)
+    profile_photo = models.ImageField(upload_to='shelters/avatars/', blank=True, null=True)
     about = models.TextField(blank=True)
     public_email = models.EmailField(blank=True)
     public_phone = models.CharField(max_length=20, blank=True)

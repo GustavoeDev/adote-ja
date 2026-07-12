@@ -24,10 +24,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         <mat-icon>assignment</mat-icon>
         <span>Pedidos</span>
       </button>
-      <button type="button" class="bottom-nav__item bottom-nav__item--disabled" disabled title="Em breve">
+      <a routerLink="/abrigo/perfil" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
         <mat-icon>home_work</mat-icon>
         <span>Perfil</span>
-      </button>
+      </a>
     </nav>
   `,
   styles: `

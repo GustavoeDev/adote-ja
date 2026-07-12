@@ -49,6 +49,13 @@ export const routes: Routes = [
             (m) => m.AnimalFormComponent,
           ),
       },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/shelter/profile/shelter-profile.component').then(
+            (m) => m.ShelterProfileComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'login' },

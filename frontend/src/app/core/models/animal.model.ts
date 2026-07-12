@@ -59,6 +59,29 @@ export interface ShelterDashboard {
   requests_count: number;
 }
 
+export interface ShelterProfile {
+  id: number;
+  name: string;
+  cover_photo_url: string | null;
+  profile_photo_url: string | null;
+  about: string;
+  public_email: string;
+  public_phone: string;
+  website: string;
+  city: string;
+  is_verified: boolean;
+  initials: string;
+}
+
+export interface ShelterProfileUpdatePayload {
+  name?: string;
+  about?: string;
+  public_email?: string;
+  public_phone?: string;
+  website?: string;
+  city?: string;
+}
+
 export interface PendingMediaFile {
   id: string;
   file: File;

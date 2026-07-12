@@ -8,6 +8,8 @@ import {
   AnimalDetail,
   AnimalWritePayload,
   ShelterDashboard,
+  ShelterProfile,
+  ShelterProfileUpdatePayload,
 } from '../models/animal.model';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +19,26 @@ export class ShelterApiService {
 
   getDashboard(): Observable<ShelterDashboard> {
     return this.http.get<ShelterDashboard>(`${this.apiUrl}/shelter/dashboard/`);
+  }
+
+  getProfile(): Observable<ShelterProfile> {
+    return this.http.get<ShelterProfile>(`${this.apiUrl}/shelter/profile/`);
+  }
+
+  updateProfile(payload: ShelterProfileUpdatePayload): Observable<ShelterProfile> {
+    return this.http.patch<ShelterProfile>(`${this.apiUrl}/shelter/profile/`, payload);
+  }
+
+  uploadCover(file: File): Observable<ShelterProfile> {
+    const formData = new FormData();
+    formData.append('cover_photo', file);
+    return this.http.post<ShelterProfile>(`${this.apiUrl}/shelter/profile/cover/`, formData);
+  }
+
+  uploadAvatar(file: File): Observable<ShelterProfile> {
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+    return this.http.post<ShelterProfile>(`${this.apiUrl}/shelter/profile/avatar/`, formData);
   }
 
   listAnimals(species?: string): Observable<Animal[]> {

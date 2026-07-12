@@ -22,17 +22,6 @@ import { AuthService } from '../../core/auth/auth.service';
         </div>
       </header>
 
-      <div class="sidebar__shelter">
-        <div class="sidebar__avatar">{{ initials() }}</div>
-        <div class="sidebar__shelter-info">
-          <p class="sidebar__shelter-name">{{ shelterName() }}</p>
-          <span class="sidebar__badge">
-            <mat-icon>verified</mat-icon>
-            Conta abrigo
-          </span>
-        </div>
-      </div>
-
       <nav class="sidebar__nav">
         <p class="sidebar__section-label">Menu</p>
 
@@ -64,11 +53,16 @@ import { AuthService } from '../../core/auth/auth.service';
           <span class="sidebar__soon">Em breve</span>
         </button>
 
-        <button type="button" class="sidebar__link sidebar__link--soon" disabled>
+        <a
+          routerLink="/abrigo/perfil"
+          routerLinkActive="sidebar__link--active"
+          class="sidebar__link"
+          (click)="navClick.emit()"
+        >
           <span class="sidebar__link-icon"><mat-icon>home_work</mat-icon></span>
           <span class="sidebar__link-text">Perfil</span>
-          <span class="sidebar__soon">Em breve</span>
-        </button>
+          <mat-icon class="sidebar__chevron">chevron_right</mat-icon>
+        </a>
       </nav>
 
       <footer class="sidebar__footer">
@@ -76,7 +70,6 @@ import { AuthService } from '../../core/auth/auth.service';
           <mat-icon>logout</mat-icon>
           Sair da conta
         </button>
-        <p class="sidebar__copy">AdoteJá · abrigos</p>
       </footer>
 
       <mat-icon class="sidebar__deco" aria-hidden="true">pets</mat-icon>
