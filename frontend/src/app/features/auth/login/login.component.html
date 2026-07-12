@@ -1,0 +1,71 @@
+<div class="auth-page">
+  <app-auth-hero />
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <div class="auth-card__brand">
+        <div class="brand-icon">
+          <mat-icon>pets</mat-icon>
+        </div>
+        <h1 class="brand-title">AdoteJá</h1>
+        <p class="brand-subtitle">Conectando vidas, transformando futuros</p>
+      </div>
+
+      @if (auth.isAuthenticated()) {
+        <div class="surface-card logged-in-card">
+          <mat-icon class="logged-in-card__icon">check_circle</mat-icon>
+          <h2 class="auth-form-title auth-form-title--visible">Login realizado</h2>
+          <p class="logged-in-card__name">{{ auth.user()?.first_name }}</p>
+          <p class="logged-in-card__meta">{{ auth.user()?.email }}</p>
+          <p class="logged-in-card__role">
+            Perfil:
+            {{ auth.user()?.role === 'shelter' ? 'Abrigo' : 'Adotante' }}
+            @if (auth.user()?.shelter_name) {
+              · {{ auth.user()?.shelter_name }}
+            }
+          </p>
+          <button type="button" class="full-width submit-btn" (click)="logout()">
+            Sair
+          </button>
+        </div>
+      } @else {
+        <div class="surface-card">
+          <h2 class="auth-form-title">Entrar na sua conta</h2>
+          <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>E-mail</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+              @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+                <mat-error>E-mail é obrigatório</mat-error>
+              }
+              @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+                <mat-error>Informe um e-mail válido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Senha</mat-label>
+              <input matInput type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+              @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+                <mat-error>Senha é obrigatória</mat-error>
+              }
+            </mat-form-field>
+
+            <button color="primary" type="submit" class="full-width submit-btn" [disabled]="loading()">
+              @if (loading()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Entrar
+              }
+            </button>
+          </form>
+        </div>
+
+        <p class="auth-footer">
+          Não tem conta?
+          <a routerLink="/cadastro" class="link-button">Cadastre-se</a>
+        </p>
+      }
+    </div>
+  </main>
+</div>

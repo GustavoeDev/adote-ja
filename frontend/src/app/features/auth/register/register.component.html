@@ -1,0 +1,115 @@
+<div class="auth-page">
+  <app-auth-hero />
+
+  <main class="auth-main">
+    <div class="auth-card auth-card--register">
+      <header class="register-header">
+        <a routerLink="/login" class="back-btn" aria-label="Voltar">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div>
+          <h1 class="register-title">Criar conta</h1>
+          <p class="register-subtitle">Escolha como deseja participar</p>
+        </div>
+      </header>
+
+      @if (auth.isAuthenticated()) {
+        <div class="surface-card logged-in-notice">
+          <p>Você já está autenticado. Para criar outra conta, faça logout na tela de login.</p>
+          <a routerLink="/login" class="link-button">Ir para login</a>
+        </div>
+      } @else {
+      <div class="role-tabs" role="tablist">
+        <button
+          type="button"
+          class="role-tab"
+          [class.role-tab--active]="activeRole() === 'adopter'"
+          (click)="setRole('adopter')"
+        >
+          <mat-icon aria-hidden="true">pets</mat-icon>
+          Sou Adotante
+        </button>
+        <button
+          type="button"
+          class="role-tab"
+          [class.role-tab--active]="activeRole() === 'shelter'"
+          (click)="setRole('shelter')"
+        >
+          <mat-icon aria-hidden="true">home_work</mat-icon>
+          Sou Abrigo
+        </button>
+      </div>
+
+      <div class="surface-card">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ activeRole() === 'adopter' ? 'Nome completo' : 'Nome do abrigo' }}</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              [placeholder]="activeRole() === 'adopter' ? 'Ana Costa' : 'Abrigo Lar Feliz'"
+            />
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error>Nome é obrigatório</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="contato@email.com" autocomplete="email" />
+            @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+              <mat-error>E-mail é obrigatório</mat-error>
+            }
+            @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+              <mat-error>Informe um e-mail válido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Telefone</mat-label>
+            <input matInput type="tel" formControlName="phone" placeholder="(11) 99999-9999" autocomplete="tel" />
+            @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+              <mat-error>Telefone é obrigatório</mat-error>
+            }
+            @if (form.controls.phone.hasError('invalidPhone') && form.controls.phone.touched) {
+              <mat-error>Informe um telefone válido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Senha</mat-label>
+            <input
+              matInput
+              type="password"
+              formControlName="password"
+              placeholder="Mínimo 8 caracteres"
+              autocomplete="new-password"
+            />
+            @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+              <mat-error>Senha é obrigatória</mat-error>
+            }
+            @if (form.controls.password.hasError('weakPassword') && form.controls.password.touched) {
+              <mat-error>A senha deve ter pelo menos 8 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <app-password-strength [password]="form.controls.password.value" />
+
+          <button type="submit" class="full-width submit-btn" [disabled]="loading()">
+            @if (loading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Criar conta
+            }
+          </button>
+        </form>
+      </div>
+
+      <p class="auth-footer">
+        Já tem conta?
+        <a routerLink="/login" class="link-button">Entrar</a>
+      </p>
+      }
+    </div>
+  </main>
+</div>
