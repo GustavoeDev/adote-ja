@@ -49,25 +49,22 @@
         </div>
       </div>
 
-      <div class="row-2">
+      <div class="row-2 row-2--breed-sex">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Raça</mat-label>
           <input matInput formControlName="breed" placeholder="Golden Retriever" />
         </mat-form-field>
-        <div class="field-block">
-          <p class="field-block__label">Sexo</p>
-          <div class="size-row">
-            @for (opt of sexOptions; track opt.id) {
-              <button
-                type="button"
-                class="size-btn"
-                [class.size-btn--active]="sex() === opt.id"
-                (click)="setSex(opt.id)"
-              >
-                {{ opt.label }}
-              </button>
-            }
-          </div>
+        <div class="size-row size-row--sex">
+          @for (opt of sexOptions; track opt.id) {
+            <button
+              type="button"
+              class="size-btn"
+              [class.size-btn--active]="sex() === opt.id"
+              (click)="setSex(opt.id)"
+            >
+              {{ opt.label }}
+            </button>
+          }
         </div>
       </div>
 
