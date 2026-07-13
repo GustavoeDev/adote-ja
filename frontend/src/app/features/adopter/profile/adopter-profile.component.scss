@@ -1,0 +1,240 @@
+.profile-loading {
+  min-height: 40dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(25, 28, 25, 0.08);
+  margin-bottom: 0.5rem;
+}
+
+.profile__identity {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.profile__avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999px;
+  background: var(--adoteja-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.15rem;
+  flex: none;
+  box-shadow: 0 6px 16px rgba(30, 111, 80, 0.25);
+}
+
+.profile__identity h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.profile__identity p {
+  margin: 0.15rem 0 0;
+  color: var(--adoteja-text-muted);
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile__active {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+  color: var(--adoteja-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.profile__active mat-icon {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.profile__edit {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--adoteja-primary-light);
+  color: var(--adoteja-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tab-panel {
+  padding: 1.25rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.full {
+  width: 100%;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--adoteja-text-muted);
+}
+
+.read-card {
+  background: var(--adoteja-surface);
+  border: 1px solid rgba(25, 28, 25, 0.09);
+  border-radius: 1rem;
+  padding: 0.25rem 1rem;
+}
+
+.read-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(25, 28, 25, 0.08);
+}
+
+.read-row:last-child {
+  border-bottom: none;
+}
+
+.read-row span {
+  font-size: 0.75rem;
+  color: var(--adoteja-text-muted);
+}
+
+.read-row strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.profile__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(25, 28, 25, 0.09);
+  background: var(--adoteja-surface);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.action-btn--danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #c62828;
+}
+
+.field-label {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.choice-grid,
+.choice-row {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.choice-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice {
+  border: 2px solid rgba(25, 28, 25, 0.1);
+  border-radius: 0.875rem;
+  background: var(--adoteja-surface);
+  padding: 0.65rem 0.5rem;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.choice--active {
+  border-color: var(--adoteja-primary);
+  background: var(--adoteja-primary-light);
+  color: var(--adoteja-primary);
+}
+
+.prefs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pref-chip {
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  background: #edf1ed;
+  color: var(--adoteja-text-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pref-chip--active {
+  background: var(--adoteja-primary);
+  color: #fff;
+}
+
+.prefs-summary {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 0.875rem;
+  background: var(--adoteja-primary-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prefs-summary span {
+  font-size: 0.75rem;
+  color: var(--adoteja-text-muted);
+  font-weight: 700;
+}
+
+.prefs-summary strong {
+  color: var(--adoteja-primary);
+  font-size: 0.9rem;
+}
