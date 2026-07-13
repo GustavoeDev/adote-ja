@@ -1,0 +1,102 @@
+@if (loading()) {
+  <div class="detail-loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else if (animal(); as a) {
+  <div class="detail">
+    <div class="detail__hero">
+      @if (photos().length) {
+        <img [src]="photos()[photoIdx()]" [alt]="a.name" />
+      } @else {
+        <div class="detail__placeholder"><mat-icon>pets</mat-icon></div>
+      }
+
+      <button type="button" class="detail__back" (click)="goBack()" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      @if (photos().length > 1) {
+        <button type="button" class="detail__nav detail__nav--prev" (click)="prevPhoto()" aria-label="Anterior">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button type="button" class="detail__nav detail__nav--next" (click)="nextPhoto()" aria-label="Próxima">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <div class="detail__dots">
+          @for (p of photos(); track p; let i = $index) {
+            <button
+              type="button"
+              class="dot"
+              [class.dot--active]="i === photoIdx()"
+              (click)="photoIdx.set(i)"
+            ></button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="detail__body">
+      <div class="detail__title-row">
+        <div>
+          <h1>{{ a.name }}</h1>
+          <p>{{ a.breed || 'SRD' }}</p>
+        </div>
+        <app-status-badge [status]="a.status" />
+      </div>
+
+      <div class="detail__vitals">
+        <div class="vital">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Idade</span>
+          <strong>{{ a.age_text || '—' }}</strong>
+        </div>
+        <div class="vital">
+          <mat-icon>monitor_weight</mat-icon>
+          <span>Peso</span>
+          <strong>{{ a.weight || '—' }}</strong>
+        </div>
+        <div class="vital">
+          <mat-icon>straighten</mat-icon>
+          <span>Porte</span>
+          <strong>{{ sizeLabel(a.size) }}</strong>
+        </div>
+        <div class="vital">
+          <mat-icon>health_and_safety</mat-icon>
+          <span>Vacinado</span>
+          <strong>{{ a.vaccinated ? 'Sim' : 'Não' }}</strong>
+        </div>
+      </div>
+
+      <section>
+        <h2>Sobre {{ a.name }}</h2>
+        <p class="detail__desc">{{ a.description || 'Sem descrição.' }}</p>
+      </section>
+
+      <a class="detail__shelter" [routerLink]="['/adotante/abrigos', a.shelter_id]">
+        <div class="detail__shelter-icon"><mat-icon>home_work</mat-icon></div>
+        <div class="detail__shelter-text">
+          <span>Responsável</span>
+          <strong>{{ a.shelter_name }}</strong>
+          <em>
+            <mat-icon>location_on</mat-icon>
+            {{ a.city || 'Cidade não informada' }}
+          </em>
+        </div>
+        <mat-icon>chevron_right</mat-icon>
+      </a>
+    </div>
+
+    <div class="detail__cta">
+      <button
+        mat-flat-button
+        color="primary"
+        class="detail__adopt"
+        [disabled]="!canAdopt()"
+        (click)="goAdopt()"
+      >
+        <mat-icon>favorite</mat-icon>
+        {{ adoptCtaLabel() }}
+      </button>
+    </div>
+  </div>
+}
