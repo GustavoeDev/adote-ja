@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import ShelterProfile, User
+from accounts.models import AdopterProfile, ShelterProfile, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -53,6 +53,8 @@ class RegisterSerializer(serializers.Serializer):
         )
         if role == User.Role.SHELTER:
             ShelterProfile.objects.create(user=user, name=validated_data['name'])
+        elif role == User.Role.ADOPTER:
+            AdopterProfile.objects.create(user=user)
         return user
 
 

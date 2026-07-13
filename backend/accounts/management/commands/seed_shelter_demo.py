@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from accounts.models import ShelterProfile, User
+from accounts.models import AdopterProfile, ShelterProfile, User
 from adoptions.models import AdoptionRequest
 from animals.models import Animal
 
@@ -86,6 +86,20 @@ class Command(BaseCommand):
         if maria_created:
             maria.set_password('Adotante123!')
             maria.save()
+        AdopterProfile.objects.get_or_create(
+            user=maria,
+            defaults={
+                'city': 'São Paulo, SP',
+                'address': 'Rua das Flores, 123',
+                'birthdate': '14/03/1992',
+                'housing_type': 'Apartamento',
+                'has_yard': 'Não',
+                'has_screens': 'Sim',
+                'other_pets': '1 gato adulto (castrado)',
+                'hours_alone': '4–6h',
+                'preferences': ['Gatos', 'Cães porte pequeno', 'Filhotes'],
+            },
+        )
 
         ana, ana_created = User.objects.get_or_create(
             email='ana@email.com',
@@ -100,6 +114,10 @@ class Command(BaseCommand):
         if ana_created:
             ana.set_password('Adotante123!')
             ana.save()
+        AdopterProfile.objects.get_or_create(
+            user=ana,
+            defaults={'city': 'Belo Horizonte, MG'},
+        )
 
         now = timezone.now()
         demo_requests = [

@@ -47,6 +47,14 @@ class AdoptionRequest(models.Model):
     adopter_phone = models.CharField(max_length=20, blank=True)
     adopter_email = models.EmailField()
     adopter_city = models.CharField(max_length=100, blank=True)
+    adopter_cpf = models.CharField(max_length=20, blank=True)
+    adopter_address = models.CharField(max_length=255, blank=True)
+    housing_type = models.CharField(max_length=40, blank=True)
+    has_yard = models.CharField(max_length=10, blank=True)
+    other_pets = models.CharField(max_length=255, blank=True)
+    motivation = models.TextField(blank=True)
+    experience = models.TextField(blank=True)
+    hours_alone = models.CharField(max_length=20, blank=True)
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
@@ -68,6 +76,13 @@ class AdoptionRequest(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['adopter', 'animal'],
+                condition=models.Q(status__in=['pending', 'in_progress']),
+                name='unique_active_adoption_request',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.adopter_name} → {self.animal.name} ({self.status})'
