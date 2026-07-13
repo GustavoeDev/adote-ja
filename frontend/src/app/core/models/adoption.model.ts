@@ -24,6 +24,14 @@ export interface AdoptionRequest {
   adopter_phone: string;
   adopter_email: string;
   adopter_city: string;
+  adopter_cpf?: string;
+  adopter_address?: string;
+  housing_type?: string;
+  has_yard?: string;
+  other_pets?: string;
+  motivation?: string;
+  experience?: string;
+  hours_alone?: string;
   message: string;
   rejection_reason: string;
   timeline: TimelineEvent[];

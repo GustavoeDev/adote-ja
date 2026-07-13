@@ -25,9 +25,13 @@ export const guestGuard: CanActivateFn = () => {
   const redirectIfLoggedIn = () => {
     const user = auth.user();
     if (!user) return true;
-    return user.role === 'shelter'
-      ? router.createUrlTree(['/abrigo/dashboard'])
-      : router.createUrlTree(['/login']);
+    if (user.role === 'shelter') {
+      return router.createUrlTree(['/abrigo/dashboard']);
+    }
+    if (user.role === 'adopter') {
+      return router.createUrlTree(['/adotante/inicio']);
+    }
+    return router.createUrlTree(['/login']);
   };
 
   if (auth.initialized()) {
@@ -45,7 +49,24 @@ export const shelterGuard: CanActivateFn = () => {
     return router.createUrlTree(['/login']);
   }
   if (auth.role() !== 'shelter') {
+    return auth.role() === 'adopter'
+      ? router.createUrlTree(['/adotante/inicio'])
+      : router.createUrlTree(['/login']);
+  }
+  return true;
+};
+
+export const adopterGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) {
     return router.createUrlTree(['/login']);
+  }
+  if (auth.role() !== 'adopter') {
+    return auth.role() === 'shelter'
+      ? router.createUrlTree(['/abrigo/dashboard'])
+      : router.createUrlTree(['/login']);
   }
   return true;
 };

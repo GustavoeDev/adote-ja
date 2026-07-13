@@ -21,6 +21,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this._user() !== null);
   readonly role = computed(() => this._user()?.role ?? null);
   readonly isShelter = computed(() => this._user()?.role === 'shelter');
+  readonly isAdopter = computed(() => this._user()?.role === 'adopter');
   readonly shelterName = computed(() => this._user()?.shelter_name ?? null);
 
   ensureCsrfCookie(): Observable<void> {
@@ -82,6 +83,10 @@ export class AuthService {
     const role = this._user()?.role;
     if (role === 'shelter') {
       void this.router.navigate(['/abrigo/dashboard']);
+      return;
+    }
+    if (role === 'adopter') {
+      void this.router.navigate(['/adotante/inicio']);
       return;
     }
     void this.router.navigate(['/login']);
