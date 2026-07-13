@@ -24,10 +24,19 @@
   font-weight: 800;
 }
 
+.home__search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .home__search {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
   padding: 0.65rem 0.9rem;
   border-radius: 0.875rem;
   background: #edf1ed;
@@ -42,6 +51,7 @@
 
 .home__search input {
   flex: 1;
+  min-width: 0;
   border: none;
   background: transparent;
   font: inherit;
@@ -54,6 +64,7 @@
   gap: 0.5rem;
   overflow-x: auto;
   scrollbar-width: none;
+  min-width: 0;
 }
 
 .chip {
@@ -70,6 +81,8 @@
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
+  height: 2rem;
+  box-sizing: border-box;
 }
 
 .chip mat-icon {
@@ -82,6 +95,26 @@
   background: var(--adoteja-primary);
   color: #fff;
   box-shadow: 0 4px 12px rgba(30, 111, 80, 0.25);
+}
+
+.home__city-filter {
+  display: flex;
+  flex: none;
+}
+
+.city-trigger {
+  max-width: 11rem;
+}
+
+.city-trigger__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.city-trigger__chevron {
+  opacity: 0.7;
 }
 
 .home__count {

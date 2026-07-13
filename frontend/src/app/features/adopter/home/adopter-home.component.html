@@ -5,17 +5,46 @@
       <h1 class="home__title">Encontre seu pet</h1>
     </div>
 
-    <label class="home__search">
-      <mat-icon>search</mat-icon>
-      <input
-        type="search"
-        placeholder="Buscar por nome ou raça..."
-        [ngModel]="search()"
-        (ngModelChange)="search.set($event)"
-      />
-    </label>
+    <div class="home__search-row">
+      <label class="home__search">
+        <mat-icon>search</mat-icon>
+        <input
+          type="search"
+          placeholder="Buscar por nome ou raça..."
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+        />
+      </label>
 
-    <div class="home__chips" role="tablist">
+      @if (cities().length) {
+        <div class="home__city-filter">
+          <button
+            type="button"
+            class="chip city-trigger"
+            [class.chip--active]="!!activeCity()"
+            [matMenuTriggerFor]="cityMenu"
+          >
+            <mat-icon>location_on</mat-icon>
+            <span class="city-trigger__label">{{ cityLabel() }}</span>
+            <mat-icon class="city-trigger__chevron">expand_more</mat-icon>
+          </button>
+          <mat-menu #cityMenu="matMenu" class="city-menu">
+            <button mat-menu-item type="button" (click)="setCity('')">
+              <mat-icon>public</mat-icon>
+              <span>Todas as cidades</span>
+            </button>
+            @for (city of cities(); track city) {
+              <button mat-menu-item type="button" (click)="setCity(city)">
+                <mat-icon>location_on</mat-icon>
+                <span>{{ city }}</span>
+              </button>
+            }
+          </mat-menu>
+        </div>
+      }
+    </div>
+
+    <div class="home__chips" role="tablist" aria-label="Filtrar por espécie">
       @for (f of filters; track f.id) {
         <button
           type="button"

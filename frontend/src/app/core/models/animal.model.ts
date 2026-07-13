@@ -1,5 +1,5 @@
 export type AnimalStatus = 'available' | 'in_process' | 'adopted';
-export type AnimalSpecies = 'dog' | 'cat' | 'rabbit' | 'other';
+export type AnimalSpecies = 'dog' | 'cat' | 'other';
 export type AnimalSize = 'small' | 'medium' | 'large';
 export type AnimalSex = 'male' | 'female';
 export type MediaType = 'photo' | 'video';

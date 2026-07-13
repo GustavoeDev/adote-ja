@@ -7,7 +7,6 @@ class Animal(models.Model):
     class Species(models.TextChoices):
         DOG = 'dog', 'Cão'
         CAT = 'cat', 'Gato'
-        RABBIT = 'rabbit', 'Coelho'
         OTHER = 'other', 'Outro'
 
     class Size(models.TextChoices):
