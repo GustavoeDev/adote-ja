@@ -1,5 +1,5 @@
 from django.contrib.auth import logout
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, When
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -64,16 +64,23 @@ class DiscoverAnimalListView(APIView):
         qs = (
             Animal.objects
             .filter(is_active=True)
+            .exclude(status=Animal.Status.ADOPTED)
             .select_related('shelter')
             .prefetch_related('media')
+            .annotate(
+                status_order=Case(
+                    When(status=Animal.Status.AVAILABLE, then=0),
+                    When(status=Animal.Status.IN_PROCESS, then=1),
+                    default=2,
+                    output_field=IntegerField(),
+                ),
+            )
+            .order_by('status_order', '-created_at')
         )
 
         species = request.query_params.get('species')
         if species in {choice.value for choice in Animal.Species}:
             qs = qs.filter(species=species)
-
-        if request.query_params.get('puppy') in {'1', 'true', 'True'}:
-            qs = qs.filter(age_months__isnull=False, age_months__lte=10)
 
         city = request.query_params.get('city')
         if city:

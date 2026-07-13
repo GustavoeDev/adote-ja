@@ -23,7 +23,6 @@ export class AdopterApiService {
     let params = new HttpParams();
     if (query.species) params = params.set('species', query.species);
     if (query.q) params = params.set('q', query.q);
-    if (query.puppy) params = params.set('puppy', '1');
     if (query.city) params = params.set('city', query.city);
     return this.http.get<DiscoverAnimal[]>(`${this.apiUrl}/discover/animals/`, { params });
   }

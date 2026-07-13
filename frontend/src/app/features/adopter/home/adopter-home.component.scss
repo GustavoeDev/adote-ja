@@ -182,9 +182,19 @@
   margin: 0;
   font-size: 0.875rem;
   font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
-.animal-card__row span,
+.animal-card__age {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--adoteja-text-muted);
+}
+
 .animal-card__body > p {
   margin: 0.15rem 0 0;
   font-size: 0.75rem;

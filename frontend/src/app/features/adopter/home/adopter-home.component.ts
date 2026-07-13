@@ -8,8 +8,9 @@ import { Router } from '@angular/router';
 import { DiscoverAnimal } from '../../../core/models/adopter.model';
 import { AdopterApiService } from '../../../core/services/adopter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { breedSexLine } from '../../../shared/utils/animal-display';
 
-type FilterId = 'all' | 'dog' | 'cat' | 'rabbit' | 'puppy';
+type FilterId = 'all' | 'dog' | 'cat' | 'rabbit';
 
 @Component({
   selector: 'app-adopter-home',
@@ -27,22 +28,20 @@ export class AdopterHomeComponent implements OnInit {
   readonly animals = signal<DiscoverAnimal[]>([]);
   readonly search = signal('');
   readonly activeFilter = signal<FilterId>('all');
+  readonly breedSexLine = breedSexLine;
 
   readonly filters: { id: FilterId; label: string; icon: string }[] = [
     { id: 'all', label: 'Todos', icon: 'pets' },
     { id: 'dog', label: 'Cães', icon: 'cruelty_free' },
     { id: 'cat', label: 'Gatos', icon: 'emoji_nature' },
     { id: 'rabbit', label: 'Coelhos', icon: 'cruelty_free' },
-    { id: 'puppy', label: 'Filhotes', icon: 'star' },
   ];
 
   readonly filtered = computed(() => {
     const q = this.search().trim().toLowerCase();
     const filter = this.activeFilter();
     return this.animals().filter((a) => {
-      const matchFilter =
-        filter === 'all' ||
-        (filter === 'puppy' ? (a.age_months ?? 999) <= 10 : a.species === filter);
+      const matchFilter = filter === 'all' || a.species === filter;
       const matchSearch =
         !q ||
         a.name.toLowerCase().includes(q) ||

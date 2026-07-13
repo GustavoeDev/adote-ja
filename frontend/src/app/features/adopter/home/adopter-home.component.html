@@ -58,10 +58,12 @@
             </div>
             <div class="animal-card__body">
               <div class="animal-card__row">
-                <h3>{{ animal.name }}</h3>
-                <span>{{ animal.age_text || '—' }}</span>
+                <h3>
+                  {{ animal.name }}
+                  <span class="animal-card__age">{{ animal.age_text || '—' }}</span>
+                </h3>
               </div>
-              <p>{{ animal.breed || 'SRD' }}</p>
+              <p>{{ breedSexLine(animal.breed, animal.sex) }}</p>
               <p class="animal-card__city">
                 <mat-icon>location_on</mat-icon>
                 {{ animal.city || 'Cidade não informada' }}

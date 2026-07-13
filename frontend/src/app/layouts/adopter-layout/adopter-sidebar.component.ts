@@ -14,7 +14,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         </div>
         <div class="sidebar__brand-text">
           <span class="sidebar__product">AdoteJá</span>
-          <span class="sidebar__tagline">Área do Adotante</span>
         </div>
       </header>
 
