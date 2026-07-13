@@ -218,6 +218,11 @@ class AdoptionRequest(models.Model):
         ])
         self.sync_timeline()
 
+    def _has_other_active_requests(self) -> bool:
+        return self.animal.adoption_requests.filter(
+            status__in=[self.Status.PENDING, self.Status.IN_PROGRESS],
+        ).exclude(pk=self.pk).exists()
+
     def mark_approved(self):
         if not self.can_decide:
             raise ValueError('A entrevista precisa ter sido realizada antes de aprovar.')
@@ -230,7 +235,7 @@ class AdoptionRequest(models.Model):
 
         animal = self.animal
         if animal.status != Animal.Status.ADOPTED:
-            animal.status = Animal.Status.IN_PROCESS
+            animal.status = Animal.Status.ADOPTED
             animal.save(update_fields=['status', 'updated_at'])
 
     def mark_rejected(self, reason: str):
@@ -249,6 +254,18 @@ class AdoptionRequest(models.Model):
         self.reviewed_at = now
         self.save(update_fields=['status', 'rejection_reason', 'reviewed_at', 'updated_at'])
         self.sync_timeline()
+
+        animal = self.animal
+        if animal.status == Animal.Status.ADOPTED:
+            return
+        if self._has_other_active_requests():
+            if animal.status != Animal.Status.IN_PROCESS:
+                animal.status = Animal.Status.IN_PROCESS
+                animal.save(update_fields=['status', 'updated_at'])
+            return
+        if animal.status != Animal.Status.AVAILABLE:
+            animal.status = Animal.Status.AVAILABLE
+            animal.save(update_fields=['status', 'updated_at'])
 
 
 class TimelineEvent(models.Model):
