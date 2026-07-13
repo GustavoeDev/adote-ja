@@ -59,7 +59,14 @@
             </mat-form-field>
             <mat-form-field appearance="outline" class="full">
               <mat-label>Data de nascimento</mat-label>
-              <input matInput formControlName="birthdate" placeholder="dd/mm/aaaa" />
+              <input
+                matInput
+                formControlName="birthdate"
+                placeholder="dd/mm/aaaa"
+                inputmode="numeric"
+                maxlength="10"
+                (input)="onBirthdateInput($event)"
+              />
             </mat-form-field>
             <mat-form-field appearance="outline" class="full">
               <mat-label>Endereço</mat-label>

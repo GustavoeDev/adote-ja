@@ -13,13 +13,20 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AdopterProfile } from '../../../core/models/adopter.model';
 import { AdopterApiService } from '../../../core/services/adopter-api.service';
-import { cpfValidator, extractErrorMessage, formatCpf, formatPhone, phoneValidator } from '../../../shared/validators/auth.validators';
+import {
+  cpfValidator,
+  extractErrorMessage,
+  formatBirthdate,
+  formatCpf,
+  formatPhone,
+  phoneValidator,
+} from '../../../shared/validators/auth.validators';
 import { DeleteAccountDialogComponent } from './delete-account-dialog.component';
 
 const PREF_OPTIONS = [
   'Cães',
   'Gatos',
-  'Coelhos',
+  'Outros',
   'Porte pequeno',
   'Porte médio',
   'Porte grande',
@@ -90,6 +97,7 @@ export class AdopterProfileComponent implements OnInit {
           ...profile,
           phone: formatPhone(profile.phone || ''),
           cpf: formatCpf(profile.cpf || ''),
+          birthdate: formatBirthdate(profile.birthdate || ''),
         });
         this.loading.set(false);
       },
@@ -117,6 +125,12 @@ export class AdopterProfileComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const formatted = formatPhone(input.value);
     this.form.controls.phone.setValue(formatted, { emitEvent: false });
+  }
+
+  onBirthdateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatBirthdate(input.value);
+    this.form.controls.birthdate.setValue(formatted, { emitEvent: false });
   }
 
   setChoice(
