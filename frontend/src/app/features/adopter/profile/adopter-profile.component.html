@@ -30,7 +30,32 @@
             </mat-form-field>
             <mat-form-field appearance="outline" class="full">
               <mat-label>Telefone</mat-label>
-              <input matInput formControlName="phone" />
+              <input
+                matInput
+                type="tel"
+                formControlName="phone"
+                placeholder="(11) 99999-9999"
+                inputmode="numeric"
+                maxlength="15"
+                (input)="onPhoneInput($event)"
+              />
+              @if (form.controls.phone.touched && form.controls.phone.hasError('invalidPhone')) {
+                <mat-error>Informe um telefone válido</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>CPF</mat-label>
+              <input
+                matInput
+                formControlName="cpf"
+                placeholder="000.000.000-00"
+                inputmode="numeric"
+                maxlength="14"
+                (input)="onCpfInput($event)"
+              />
+              @if (form.controls.cpf.touched && form.controls.cpf.hasError('invalidCpf')) {
+                <mat-error>CPF inválido</mat-error>
+              }
             </mat-form-field>
             <mat-form-field appearance="outline" class="full">
               <mat-label>Data de nascimento</mat-label>
@@ -48,6 +73,7 @@
             <div class="read-card">
               <div class="read-row"><span>Nome completo</span><strong>{{ p.name || '—' }}</strong></div>
               <div class="read-row"><span>Telefone</span><strong>{{ p.phone || '—' }}</strong></div>
+              <div class="read-row"><span>CPF</span><strong>{{ p.cpf || '—' }}</strong></div>
               <div class="read-row"><span>Data de nascimento</span><strong>{{ p.birthdate || '—' }}</strong></div>
               <div class="read-row"><span>Endereço</span><strong>{{ p.address || '—' }}</strong></div>
               <div class="read-row"><span>Cidade / Estado</span><strong>{{ p.city || '—' }}</strong></div>

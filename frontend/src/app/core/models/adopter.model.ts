@@ -30,6 +30,7 @@ export interface AdopterProfile {
   name: string;
   email: string;
   phone: string;
+  cpf: string;
   birthdate: string;
   address: string;
   city: string;
@@ -45,6 +46,7 @@ export interface AdopterProfile {
 export interface AdopterProfileUpdatePayload {
   name?: string;
   phone?: string;
+  cpf?: string;
   birthdate?: string;
   address?: string;
   city?: string;
@@ -76,7 +78,6 @@ export interface CreateAdoptionRequestPayload {
 export interface DiscoverAnimalsQuery {
   species?: string;
   q?: string;
-  puppy?: boolean;
   city?: string;
 }
 

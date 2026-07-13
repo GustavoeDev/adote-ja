@@ -11,7 +11,14 @@ import { forkJoin } from 'rxjs';
 
 import { AdopterProfile, DiscoverAnimalDetail } from '../../../core/models/adopter.model';
 import { AdopterApiService } from '../../../core/services/adopter-api.service';
-import { extractErrorMessage } from '../../../shared/validators/auth.validators';
+import { breedLabel } from '../../../shared/utils/animal-display';
+import {
+  cpfValidator,
+  extractErrorMessage,
+  formatCpf,
+  formatPhone,
+  phoneValidator,
+} from '../../../shared/validators/auth.validators';
 
 @Component({
   selector: 'app-adoption-form',
@@ -38,6 +45,7 @@ export class AdoptionFormComponent implements OnInit {
   readonly loading = signal(true);
   readonly submitting = signal(false);
   readonly success = signal(false);
+  readonly breedLabel = breedLabel;
   readonly step = signal(1);
   readonly animal = signal<DiscoverAnimalDetail | null>(null);
   readonly profile = signal<AdopterProfile | null>(null);
@@ -48,8 +56,8 @@ export class AdoptionFormComponent implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     adopter_name: ['', [Validators.required, Validators.maxLength(150)]],
-    adopter_cpf: ['', [Validators.required]],
-    adopter_phone: ['', Validators.required],
+    adopter_cpf: ['', [cpfValidator()]],
+    adopter_phone: ['', [Validators.required, phoneValidator()]],
     adopter_email: ['', [Validators.required, Validators.email]],
     adopter_address: ['', Validators.required],
     adopter_city: ['', Validators.required],
@@ -77,7 +85,8 @@ export class AdoptionFormComponent implements OnInit {
         this.profile.set(profile);
         this.form.patchValue({
           adopter_name: profile.name || '',
-          adopter_phone: profile.phone || '',
+          adopter_cpf: formatCpf(profile.cpf || ''),
+          adopter_phone: formatPhone(profile.phone || ''),
           adopter_email: profile.email || '',
           adopter_address: profile.address || '',
           adopter_city: profile.city || '',
@@ -100,6 +109,18 @@ export class AdoptionFormComponent implements OnInit {
         void this.router.navigate(['/adotante/inicio']);
       },
     });
+  }
+
+  onCpfInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatCpf(input.value);
+    this.form.controls.adopter_cpf.setValue(formatted, { emitEvent: false });
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatPhone(input.value);
+    this.form.controls.adopter_phone.setValue(formatted, { emitEvent: false });
   }
 
   setChoice(control: 'housing_type' | 'has_yard' | 'hours_alone', value: string): void {

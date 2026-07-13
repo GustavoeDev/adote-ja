@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AdopterProfile } from '../../../core/models/adopter.model';
 import { AdopterApiService } from '../../../core/services/adopter-api.service';
-import { extractErrorMessage } from '../../../shared/validators/auth.validators';
+import { cpfValidator, extractErrorMessage, formatCpf, formatPhone, phoneValidator } from '../../../shared/validators/auth.validators';
 import { DeleteAccountDialogComponent } from './delete-account-dialog.component';
 
 const PREF_OPTIONS = [
@@ -64,7 +64,8 @@ export class AdopterProfileComponent implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     name: [''],
-    phone: [''],
+    phone: ['', [phoneValidator()]],
+    cpf: ['', [cpfValidator({ required: false })]],
     birthdate: [''],
     address: [''],
     city: [''],
@@ -85,7 +86,11 @@ export class AdopterProfileComponent implements OnInit {
       next: (profile) => {
         this.profile.set(profile);
         this.prefs.set([...(profile.preferences || [])]);
-        this.form.patchValue(profile);
+        this.form.patchValue({
+          ...profile,
+          phone: formatPhone(profile.phone || ''),
+          cpf: formatCpf(profile.cpf || ''),
+        });
         this.loading.set(false);
       },
       error: () => {
@@ -100,6 +105,18 @@ export class AdopterProfileComponent implements OnInit {
 
   startEdit(): void {
     this.editMode.set(true);
+  }
+
+  onCpfInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatCpf(input.value);
+    this.form.controls.cpf.setValue(formatted, { emitEvent: false });
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatPhone(input.value);
+    this.form.controls.phone.setValue(formatted, { emitEvent: false });
   }
 
   setChoice(
@@ -131,6 +148,15 @@ export class AdopterProfileComponent implements OnInit {
   }
 
   save(): void {
+    if (this.form.controls.phone.invalid || (this.form.controls.cpf.value && this.form.controls.cpf.invalid)) {
+      this.form.controls.phone.markAsTouched();
+      this.form.controls.cpf.markAsTouched();
+      this.snackBar.open('Verifique telefone e CPF informados.', 'Fechar', {
+        duration: 3000,
+        panelClass: 'snackbar-error',
+      });
+      return;
+    }
     this.saving.set(true);
     this.api
       .updateProfile({

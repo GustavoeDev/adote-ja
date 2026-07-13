@@ -8,7 +8,7 @@
       </button>
       <div>
         <h1>Formulário de Adoção</h1>
-        <p>{{ a.name }} · {{ a.breed || 'SRD' }}</p>
+        <p>{{ a.name }} · {{ breedLabel(a.breed) }}</p>
       </div>
     </header>
 
@@ -39,11 +39,36 @@
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
           <mat-label>CPF</mat-label>
-          <input matInput formControlName="adopter_cpf" placeholder="000.000.000-00" />
+          <input
+            matInput
+            formControlName="adopter_cpf"
+            placeholder="000.000.000-00"
+            inputmode="numeric"
+            maxlength="14"
+            (input)="onCpfInput($event)"
+          />
+          @if (form.controls.adopter_cpf.touched && form.controls.adopter_cpf.hasError('required')) {
+            <mat-error>CPF é obrigatório</mat-error>
+          } @else if (form.controls.adopter_cpf.touched && form.controls.adopter_cpf.hasError('invalidCpf')) {
+            <mat-error>CPF inválido</mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
           <mat-label>Telefone</mat-label>
-          <input matInput formControlName="adopter_phone" />
+          <input
+            matInput
+            type="tel"
+            formControlName="adopter_phone"
+            placeholder="(11) 99999-9999"
+            inputmode="numeric"
+            maxlength="15"
+            (input)="onPhoneInput($event)"
+          />
+          @if (form.controls.adopter_phone.touched && form.controls.adopter_phone.hasError('required')) {
+            <mat-error>Telefone é obrigatório</mat-error>
+          } @else if (form.controls.adopter_phone.touched && form.controls.adopter_phone.hasError('invalidPhone')) {
+            <mat-error>Informe um telefone válido</mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
           <mat-label>E-mail</mat-label>
@@ -124,20 +149,22 @@
     </form>
 
     <div class="wizard__footer">
-      @if (step() > 1) {
-        <button mat-stroked-button type="button" (click)="back()">Voltar</button>
-      }
-      @if (step() < 3) {
-        <button mat-flat-button color="primary" type="button" (click)="next()">
-          Continuar
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      } @else {
-        <button mat-flat-button color="primary" type="button" [disabled]="submitting()" (click)="submit()">
-          <mat-icon>check_circle</mat-icon>
-          Enviar
-        </button>
-      }
+      <div class="wizard__footer-inner">
+        @if (step() > 1) {
+          <button mat-stroked-button type="button" (click)="back()">Voltar</button>
+        }
+        @if (step() < 3) {
+          <button mat-flat-button color="primary" type="button" (click)="next()">
+            Continuar
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        } @else {
+          <button mat-flat-button color="primary" type="button" [disabled]="submitting()" (click)="submit()">
+            <mat-icon>check_circle</mat-icon>
+            Enviar
+          </button>
+        }
+      </div>
     </div>
   </div>
 }

@@ -51,6 +51,7 @@ class AdopterProfile(models.Model):
         limit_choices_to={'role': User.Role.ADOPTER},
     )
     birthdate = models.CharField(max_length=20, blank=True)
+    cpf = models.CharField(max_length=14, blank=True)
     address = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=100, blank=True)
     housing_type = models.CharField(max_length=40, blank=True)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from accounts.cpf import is_valid_cpf, normalize_cpf
 from adoptions.models import AdoptionRequest, TimelineEvent
 from animals.models import Animal
 
@@ -68,7 +69,7 @@ class AdoptionRequestSerializer(serializers.ModelSerializer):
 class AdopterCreateAdoptionRequestSerializer(serializers.Serializer):
     animal_id = serializers.IntegerField()
     adopter_name = serializers.CharField(max_length=150)
-    adopter_cpf = serializers.CharField(max_length=20)
+    adopter_cpf = serializers.CharField(max_length=14)
     adopter_phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
     adopter_email = serializers.EmailField()
     adopter_address = serializers.CharField(max_length=255, required=False, allow_blank=True)
@@ -91,10 +92,37 @@ class AdopterCreateAdoptionRequestSerializer(serializers.Serializer):
         return value
 
     def validate_adopter_cpf(self, value):
-        digits = ''.join(c for c in value if c.isdigit())
-        if len(digits) != 11:
+        if not is_valid_cpf(value):
             raise serializers.ValidationError('CPF inválido.')
-        return value
+        return normalize_cpf(value)
+
+    def _sync_adopter_profile(self, adopter, validated_data):
+        from accounts.models import AdopterProfile
+
+        profile, _ = AdopterProfile.objects.get_or_create(user=adopter)
+        name = (validated_data.get('adopter_name') or '').strip()
+        phone = (validated_data.get('adopter_phone') or '').strip()
+
+        if name:
+            adopter.first_name = name
+            adopter.last_name = ''
+        if 'adopter_phone' in validated_data:
+            adopter.phone = phone
+        adopter.save(update_fields=['first_name', 'last_name', 'phone'])
+
+        field_map = {
+            'cpf': 'adopter_cpf',
+            'address': 'adopter_address',
+            'city': 'adopter_city',
+            'housing_type': 'housing_type',
+            'has_yard': 'has_yard',
+            'other_pets': 'other_pets',
+            'hours_alone': 'hours_alone',
+        }
+        for profile_field, data_key in field_map.items():
+            if data_key in validated_data:
+                setattr(profile, profile_field, validated_data.get(data_key) or '')
+        profile.save()
 
     def create(self, validated_data):
         request = self.context['request']
@@ -113,12 +141,14 @@ class AdopterCreateAdoptionRequestSerializer(serializers.Serializer):
                 {'animal_id': 'Você já possui uma solicitação ativa para este animal.'}
             )
 
+        self._sync_adopter_profile(adopter, validated_data)
+
         motivation = validated_data.get('motivation', '')
         req = AdoptionRequest.objects.create(
             animal=animal,
             adopter=adopter,
             adopter_name=validated_data['adopter_name'],
-            adopter_cpf=validated_data.get('adopter_cpf', ''),
+            adopter_cpf=validated_data['adopter_cpf'],
             adopter_phone=validated_data.get('adopter_phone') or adopter.phone,
             adopter_email=validated_data['adopter_email'],
             adopter_address=validated_data.get('adopter_address', ''),
