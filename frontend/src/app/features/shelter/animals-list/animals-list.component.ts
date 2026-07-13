@@ -41,10 +41,9 @@ export class AnimalsListComponent implements OnInit {
   readonly breedLabel = breedLabel;
 
   readonly filters: { id: SpeciesFilter; label: string; icon: string }[] = [
-    { id: 'all', label: 'Todos', icon: 'apps' },
-    { id: 'dog', label: 'Cães', icon: 'pets' },
-    { id: 'cat', label: 'Gatos', icon: 'cruelty_free' },
-    { id: 'rabbit', label: 'Coelhos', icon: 'emoji_nature' },
+    { id: 'all', label: 'Todos', icon: 'all_inclusive' },
+    { id: 'dog', label: 'Cães', icon: 'pet_supplies' },
+    { id: 'cat', label: 'Gatos', icon: 'pets' },
     { id: 'other', label: 'Outros', icon: 'spa' },
   ];
 
@@ -61,7 +60,6 @@ export class AnimalsListComponent implements OnInit {
       all: list.length,
       dog: list.filter((a) => a.species === 'dog').length,
       cat: list.filter((a) => a.species === 'cat').length,
-      rabbit: list.filter((a) => a.species === 'rabbit').length,
       other: list.filter((a) => a.species === 'other').length,
     };
   });

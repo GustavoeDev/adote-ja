@@ -57,9 +57,8 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
   readonly neutered = signal(false);
 
   readonly speciesOptions: { id: AnimalSpecies; label: string; icon: string }[] = [
-    { id: 'dog', label: 'Cão', icon: 'pets' },
-    { id: 'cat', label: 'Gato', icon: 'cruelty_free' },
-    { id: 'rabbit', label: 'Coelho', icon: 'emoji_nature' },
+    { id: 'dog', label: 'Cão', icon: 'pet_supplies' },
+    { id: 'cat', label: 'Gato', icon: 'pets' },
     { id: 'other', label: 'Outro', icon: 'spa' },
   ];
 
