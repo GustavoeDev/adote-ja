@@ -3,10 +3,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import IsShelter
+from accounts.permissions import IsAdopter, IsShelter
 from adoptions.models import AdoptionRequest
-from adoptions.serializers import AdoptionRequestSerializer
-
+from adoptions.serializers import (
+    AdopterCreateAdoptionRequestSerializer,
+    AdoptionRequestSerializer,
+)
 
 def get_shelter_request(request, pk):
     profile = request.user.shelter_profile
@@ -133,3 +135,52 @@ class ShelterAdoptionRequestRejectView(APIView):
         except ValueError as exc:
             return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serialize_request(obj, request))
+
+
+def get_adopter_request(request, pk):
+    try:
+        return (
+            AdoptionRequest.objects
+            .filter(adopter=request.user)
+            .select_related('animal', 'adopter')
+            .prefetch_related('animal__media', 'timeline_events')
+            .get(pk=pk)
+        )
+    except AdoptionRequest.DoesNotExist:
+        return None
+
+
+class AdopterAdoptionRequestListCreateView(APIView):
+    permission_classes = [IsAuthenticated, IsAdopter]
+
+    def get(self, request):
+        qs = (
+            AdoptionRequest.objects
+            .filter(adopter=request.user)
+            .select_related('animal', 'adopter')
+            .prefetch_related('animal__media', 'timeline_events')
+        )
+        serializer = AdoptionRequestSerializer(qs, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = AdopterCreateAdoptionRequestSerializer(
+            data=request.data,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        req = serializer.save()
+        return Response(
+            serialize_request(req, request),
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AdopterAdoptionRequestDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsAdopter]
+
+    def get(self, request, pk):
+        obj = get_adopter_request(request, pk)
+        if not obj:
+            return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(AdoptionRequestSerializer(obj, context={'request': request}).data)
