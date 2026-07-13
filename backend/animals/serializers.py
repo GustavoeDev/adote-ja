@@ -23,6 +23,7 @@ class AnimalMediaSerializer(serializers.ModelSerializer):
 class AnimalListSerializer(serializers.ModelSerializer):
     cover_photo_url = serializers.SerializerMethodField()
     shelter_name = serializers.CharField(source='shelter.name', read_only=True)
+    city = serializers.CharField(source='display_city', read_only=True)
 
     class Meta:
         model = Animal
@@ -44,6 +45,7 @@ class AnimalListSerializer(serializers.ModelSerializer):
 class AnimalDetailSerializer(serializers.ModelSerializer):
     media = AnimalMediaSerializer(many=True, read_only=True)
     shelter_name = serializers.CharField(source='shelter.name', read_only=True)
+    city = serializers.CharField(source='display_city', read_only=True)
 
     class Meta:
         model = Animal
@@ -52,7 +54,7 @@ class AnimalDetailSerializer(serializers.ModelSerializer):
             'size', 'status', 'description', 'vaccinated', 'neutered', 'city',
             'is_active', 'media', 'shelter_name', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'media', 'shelter_name']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'media', 'shelter_name', 'city']
 
 
 class AnimalWriteSerializer(serializers.ModelSerializer):

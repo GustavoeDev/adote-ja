@@ -76,6 +76,7 @@ class DiscoverAnimalDetailSerializer(serializers.ModelSerializer):
     shelter_id = serializers.IntegerField(source='shelter.id', read_only=True)
     cover_photo_url = serializers.SerializerMethodField()
     has_active_request = serializers.SerializerMethodField()
+    city = serializers.CharField(source='display_city', read_only=True)
 
     class Meta:
         model = Animal

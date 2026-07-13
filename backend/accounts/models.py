@@ -33,6 +33,19 @@ class ShelterProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        previous_city = None
+        if self.pk:
+            previous_city = (
+                type(self)
+                .objects.filter(pk=self.pk)
+                .values_list('city', flat=True)
+                .first()
+            )
+        super().save(*args, **kwargs)
+        if previous_city is not None and previous_city != self.city:
+            self.animals.update(city=self.city)
+
     def __str__(self):
         return self.name
 

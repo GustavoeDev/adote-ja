@@ -48,6 +48,12 @@ class Animal(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def display_city(self) -> str:
+        if self.city:
+            return self.city
+        return self.shelter.city if self.shelter_id else ''
+
 
 class AnimalMedia(models.Model):
     class MediaType(models.TextChoices):

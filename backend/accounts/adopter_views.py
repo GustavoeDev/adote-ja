@@ -84,7 +84,8 @@ class DiscoverAnimalListView(APIView):
 
         city = request.query_params.get('city')
         if city:
-            qs = qs.filter(city__icontains=city.strip())
+            city = city.strip()
+            qs = qs.filter(Q(city__icontains=city) | Q(shelter__city__icontains=city))
 
         q = (request.query_params.get('q') or '').strip()
         if q:
