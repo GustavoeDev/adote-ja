@@ -14,6 +14,7 @@ import { AuthHeroComponent } from '../../../shared/components/auth-hero/auth-her
 import { PasswordStrengthComponent } from '../../../shared/components/password-strength/password-strength.component';
 import {
   extractErrorMessage,
+  formatPhone,
   phoneValidator,
   strongPasswordValidator,
 } from '../../../shared/validators/auth.validators';
@@ -63,6 +64,12 @@ export class RegisterComponent {
 
   setRole(role: UserRole): void {
     this.activeRole.set(role);
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatPhone(input.value);
+    this.form.controls.phone.setValue(formatted, { emitEvent: false });
   }
 
   submit(): void {
