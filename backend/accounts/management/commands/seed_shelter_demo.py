@@ -39,22 +39,22 @@ class Command(BaseCommand):
 
         animals_data = [
             {
-                'name': 'Bolinha', 'species': 'dog', 'breed': 'Golden Retriever',
+                'name': 'Bolinha', 'species': 'dog', 'breed': 'Golden Retriever', 'sex': 'female',
                 'age_text': '2 anos', 'age_months': 24, 'weight': '28 kg', 'size': 'large',
                 'status': 'available', 'vaccinated': True, 'neutered': True,
             },
             {
-                'name': 'Thor', 'species': 'dog', 'breed': 'Labrador',
+                'name': 'Thor', 'species': 'dog', 'breed': 'Labrador', 'sex': 'male',
                 'age_text': '3 anos', 'age_months': 36, 'weight': '32 kg', 'size': 'large',
                 'status': 'in_process', 'vaccinated': True, 'neutered': True,
             },
             {
-                'name': 'Luna', 'species': 'cat', 'breed': 'Persa',
+                'name': 'Luna', 'species': 'cat', 'breed': 'Persa', 'sex': 'female',
                 'age_text': '1 ano', 'age_months': 12, 'weight': '4 kg', 'size': 'small',
                 'status': 'available', 'vaccinated': True, 'neutered': False,
             },
             {
-                'name': 'Mel', 'species': 'cat', 'breed': 'SRD',
+                'name': 'Mel', 'species': 'cat', 'breed': 'SRD', 'sex': 'female',
                 'age_text': '8 meses', 'age_months': 8, 'weight': '3 kg', 'size': 'small',
                 'status': 'available', 'vaccinated': True, 'neutered': False,
             },

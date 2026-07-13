@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from accounts.cpf import is_valid_cpf, normalize_cpf
 from accounts.models import AdopterProfile, ShelterProfile
 from animals.models import Animal
 from animals.serializers import AnimalListSerializer, AnimalMediaSerializer
@@ -17,6 +18,7 @@ class AdopterProfileSerializer(serializers.ModelSerializer):
             'name',
             'email',
             'phone',
+            'cpf',
             'birthdate',
             'address',
             'city',
@@ -38,6 +40,14 @@ class AdopterProfileSerializer(serializers.ModelSerializer):
         name = obj.user.get_full_name() or obj.user.first_name or obj.user.email
         parts = [p for p in name.split() if p]
         return ''.join(p[0].upper() for p in parts[:2]) or 'AD'
+
+    def validate_cpf(self, value):
+        value = (value or '').strip()
+        if not value:
+            return ''
+        if not is_valid_cpf(value):
+            raise serializers.ValidationError('CPF inválido.')
+        return normalize_cpf(value)
 
     def update(self, instance, validated_data):
         name = validated_data.pop('name', None)
@@ -70,7 +80,7 @@ class DiscoverAnimalDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Animal
         fields = [
-            'id', 'name', 'species', 'breed', 'age_text', 'age_months', 'weight',
+            'id', 'name', 'species', 'breed', 'sex', 'age_text', 'age_months', 'weight',
             'size', 'status', 'description', 'vaccinated', 'neutered', 'city',
             'is_active', 'media', 'shelter_name', 'shelter_id', 'cover_photo_url',
             'has_active_request', 'created_at', 'updated_at',

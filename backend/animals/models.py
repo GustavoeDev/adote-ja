@@ -15,6 +15,10 @@ class Animal(models.Model):
         MEDIUM = 'medium', 'Médio'
         LARGE = 'large', 'Grande'
 
+    class Sex(models.TextChoices):
+        MALE = 'male', 'Macho'
+        FEMALE = 'female', 'Fêmea'
+
     class Status(models.TextChoices):
         AVAILABLE = 'available', 'Disponível'
         IN_PROCESS = 'in_process', 'Em processo'
@@ -24,6 +28,7 @@ class Animal(models.Model):
     name = models.CharField(max_length=100)
     species = models.CharField(max_length=20, choices=Species.choices)
     breed = models.CharField(max_length=100, blank=True)
+    sex = models.CharField(max_length=10, choices=Sex.choices, blank=True)
     age_text = models.CharField(max_length=50, blank=True)
     age_months = models.PositiveIntegerField(null=True, blank=True)
     weight = models.CharField(max_length=30, blank=True)

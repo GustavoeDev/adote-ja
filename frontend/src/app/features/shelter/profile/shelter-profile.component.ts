@@ -13,7 +13,8 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Animal, ShelterProfile } from '../../../core/models/animal.model';
 import { ShelterApiService } from '../../../core/services/shelter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { extractErrorMessage } from '../../../shared/validators/auth.validators';
+import { breedLabel } from '../../../shared/utils/animal-display';
+import { extractErrorMessage, formatPhone, phoneValidator } from '../../../shared/validators/auth.validators';
 
 @Component({
   selector: 'app-shelter-profile',
@@ -47,6 +48,7 @@ export class ShelterProfileComponent implements OnInit {
   readonly animals = signal<Animal[]>([]);
   readonly coverPreview = signal<string | null>(null);
   readonly avatarPreview = signal<string | null>(null);
+  readonly breedLabel = breedLabel;
 
   private pendingCover: File | null = null;
   private pendingAvatar: File | null = null;
@@ -54,7 +56,7 @@ export class ShelterProfileComponent implements OnInit {
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     about: [''],
-    public_phone: [''],
+    public_phone: ['', [phoneValidator()]],
     public_email: ['', [Validators.email]],
     website: [''],
     city: [''],
@@ -96,7 +98,7 @@ export class ShelterProfileComponent implements OnInit {
     this.form.patchValue({
       name: profile.name,
       about: profile.about,
-      public_phone: profile.public_phone,
+      public_phone: formatPhone(profile.public_phone || ''),
       public_email: profile.public_email,
       website: profile.website,
       city: profile.city,
@@ -111,6 +113,12 @@ export class ShelterProfileComponent implements OnInit {
     const profile = this.profile();
     if (profile) this.patchForm(profile);
     this.editMode.set(true);
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatPhone(input.value);
+    this.form.controls.public_phone.setValue(formatted, { emitEvent: false });
   }
 
   cancelEdit(): void {

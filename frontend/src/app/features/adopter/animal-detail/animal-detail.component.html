@@ -39,7 +39,7 @@
       <div class="detail__title-row">
         <div>
           <h1>{{ a.name }}</h1>
-          <p>{{ a.breed || 'SRD' }}</p>
+          <p>{{ breedLabel(a.breed) }}</p>
         </div>
         <app-status-badge [status]="a.status" />
       </div>

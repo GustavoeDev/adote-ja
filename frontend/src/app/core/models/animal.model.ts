@@ -1,6 +1,7 @@
 export type AnimalStatus = 'available' | 'in_process' | 'adopted';
 export type AnimalSpecies = 'dog' | 'cat' | 'rabbit' | 'other';
 export type AnimalSize = 'small' | 'medium' | 'large';
+export type AnimalSex = 'male' | 'female';
 export type MediaType = 'photo' | 'video';
 
 export interface AnimalMedia {
@@ -16,6 +17,7 @@ export interface Animal {
   name: string;
   species: AnimalSpecies;
   breed: string;
+  sex: AnimalSex | '';
   age_text: string;
   weight: string;
   size: AnimalSize | '';
@@ -40,6 +42,7 @@ export interface AnimalWritePayload {
   name: string;
   species: AnimalSpecies;
   breed?: string;
+  sex?: AnimalSex | '';
   age_text?: string;
   age_months?: number | null;
   weight?: string;

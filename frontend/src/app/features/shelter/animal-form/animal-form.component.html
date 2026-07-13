@@ -54,31 +54,47 @@
           <mat-label>Raça</mat-label>
           <input matInput formControlName="breed" placeholder="Golden Retriever" />
         </mat-form-field>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Idade</mat-label>
-          <input matInput formControlName="age_text" placeholder="2 anos" />
-        </mat-form-field>
-      </div>
-
-      <div class="row-2">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Peso</mat-label>
-          <input matInput formControlName="weight" placeholder="12 kg" />
-        </mat-form-field>
         <div class="field-block">
-          <p class="field-block__label">Porte</p>
+          <p class="field-block__label">Sexo</p>
           <div class="size-row">
-            @for (opt of sizeOptions; track opt.id) {
+            @for (opt of sexOptions; track opt.id) {
               <button
                 type="button"
                 class="size-btn"
-                [class.size-btn--active]="size() === opt.id"
-                (click)="setSize(opt.id)"
+                [class.size-btn--active]="sex() === opt.id"
+                (click)="setSex(opt.id)"
               >
                 {{ opt.label }}
               </button>
             }
           </div>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Idade</mat-label>
+          <input matInput formControlName="age_text" placeholder="2 anos" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Peso</mat-label>
+          <input matInput formControlName="weight" placeholder="12 kg" />
+        </mat-form-field>
+      </div>
+
+      <div class="field-block">
+        <p class="field-block__label">Porte</p>
+        <div class="size-row">
+          @for (opt of sizeOptions; track opt.id) {
+            <button
+              type="button"
+              class="size-btn"
+              [class.size-btn--active]="size() === opt.id"
+              (click)="setSize(opt.id)"
+            >
+              {{ opt.label }}
+            </button>
+          }
         </div>
       </div>
 

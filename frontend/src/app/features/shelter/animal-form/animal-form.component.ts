@@ -12,6 +12,7 @@ import { of, switchMap } from 'rxjs';
 import {
   AnimalDetail,
   AnimalMedia,
+  AnimalSex,
   AnimalSize,
   AnimalSpecies,
   PendingMediaFile,
@@ -51,6 +52,7 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
   readonly pendingFiles = signal<PendingMediaFile[]>([]);
   readonly species = signal<AnimalSpecies | ''>('');
   readonly size = signal<AnimalSize | ''>('');
+  readonly sex = signal<AnimalSex | ''>('');
   readonly vaccinated = signal(false);
   readonly neutered = signal(false);
 
@@ -65,6 +67,11 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
     { id: 'small', label: 'P' },
     { id: 'medium', label: 'M' },
     { id: 'large', label: 'G' },
+  ];
+
+  readonly sexOptions: { id: AnimalSex; label: string }[] = [
+    { id: 'male', label: 'Macho' },
+    { id: 'female', label: 'Fêmea' },
   ];
 
   readonly form = this.fb.nonNullable.group({
@@ -120,6 +127,7 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
     });
     this.species.set(animal.species);
     this.size.set(animal.size || '');
+    this.sex.set(animal.sex || '');
     this.vaccinated.set(animal.vaccinated);
     this.neutered.set(animal.neutered);
     this.existingMedia.set(animal.media);
@@ -131,6 +139,10 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
 
   setSize(value: AnimalSize): void {
     this.size.set(value);
+  }
+
+  setSex(value: AnimalSex): void {
+    this.sex.set(value);
   }
 
   toggleVaccinated(): void {
@@ -207,6 +219,7 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
       name,
       species: this.species() as AnimalSpecies,
       breed,
+      sex: this.sex(),
       age_text,
       weight,
       size: this.size(),

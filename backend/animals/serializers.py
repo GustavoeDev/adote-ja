@@ -27,7 +27,7 @@ class AnimalListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Animal
         fields = [
-            'id', 'name', 'species', 'breed', 'age_text', 'weight', 'size',
+            'id', 'name', 'species', 'breed', 'sex', 'age_text', 'weight', 'size',
             'status', 'cover_photo_url', 'shelter_name', 'city', 'is_active',
         ]
 
@@ -48,7 +48,7 @@ class AnimalDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Animal
         fields = [
-            'id', 'name', 'species', 'breed', 'age_text', 'age_months', 'weight',
+            'id', 'name', 'species', 'breed', 'sex', 'age_text', 'age_months', 'weight',
             'size', 'status', 'description', 'vaccinated', 'neutered', 'city',
             'is_active', 'media', 'shelter_name', 'created_at', 'updated_at',
         ]
@@ -59,7 +59,7 @@ class AnimalWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Animal
         fields = [
-            'name', 'species', 'breed', 'age_text', 'age_months', 'weight',
+            'name', 'species', 'breed', 'sex', 'age_text', 'age_months', 'weight',
             'size', 'description', 'vaccinated', 'neutered', 'city', 'status',
         ]
 

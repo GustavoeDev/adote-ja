@@ -11,6 +11,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Animal, ShelterDashboard } from '../../../core/models/animal.model';
 import { ShelterApiService } from '../../../core/services/shelter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { breedLabel } from '../../../shared/utils/animal-display';
 import { ConfirmInactivateDialogComponent } from './confirm-inactivate-dialog.component';
 
 const DASHBOARD_ANIMALS_PREVIEW = 5;
@@ -38,6 +39,7 @@ export class ShelterDashboardComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly loading = signal(true);
+  readonly breedLabel = breedLabel;
   readonly dashboard = signal<ShelterDashboard | null>(null);
   readonly animals = signal<Animal[]>([]);
   readonly openMenuId = signal<number | null>(null);

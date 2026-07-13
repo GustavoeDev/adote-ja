@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { Animal, AnimalSpecies } from '../../../core/models/animal.model';
 import { ShelterApiService } from '../../../core/services/shelter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { breedLabel } from '../../../shared/utils/animal-display';
 import { ConfirmInactivateDialogComponent } from '../dashboard/confirm-inactivate-dialog.component';
 
 type SpeciesFilter = 'all' | AnimalSpecies;
@@ -37,6 +38,7 @@ export class AnimalsListComponent implements OnInit {
   readonly animals = signal<Animal[]>([]);
   readonly filter = signal<SpeciesFilter>('all');
   readonly openMenuId = signal<number | null>(null);
+  readonly breedLabel = breedLabel;
 
   readonly filters: { id: SpeciesFilter; label: string; icon: string }[] = [
     { id: 'all', label: 'Todos', icon: 'apps' },

@@ -79,7 +79,7 @@
                   <app-status-badge [status]="animal.status" />
                 </div>
                 <p class="animal-row__meta">
-                  {{ animal.breed || 'Sem raça' }}
+                  {{ breedLabel(animal.breed) }}
                   @if (animal.age_text) {
                     · {{ animal.age_text }}
                   }

@@ -8,6 +8,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DiscoverAnimalDetail } from '../../../core/models/adopter.model';
 import { AdopterApiService } from '../../../core/services/adopter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { breedLabel } from '../../../shared/utils/animal-display';
 
 @Component({
   selector: 'app-animal-detail',
@@ -32,6 +33,7 @@ export class AnimalDetailComponent implements OnInit {
   readonly loading = signal(true);
   readonly animal = signal<DiscoverAnimalDetail | null>(null);
   readonly photoIdx = signal(0);
+  readonly breedLabel = breedLabel;
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));

@@ -10,7 +10,7 @@ class AnimalMediaInline(admin.TabularInline):
 
 @admin.register(Animal)
 class AnimalAdmin(admin.ModelAdmin):
-    list_display = ['name', 'species', 'status', 'shelter', 'is_active']
-    list_filter = ['species', 'status', 'is_active']
+    list_display = ['name', 'species', 'sex', 'status', 'shelter', 'is_active']
+    list_filter = ['species', 'sex', 'status', 'is_active']
     search_fields = ['name', 'breed']
     inlines = [AnimalMediaInline]
