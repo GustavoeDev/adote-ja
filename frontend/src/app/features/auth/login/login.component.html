@@ -45,7 +45,23 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Senha</mat-label>
-              <input matInput type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+              <input
+                matInput
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword() ? 'Ocultar senha' : 'Mostrar senha'"
+                [attr.aria-pressed]="showPassword()"
+              >
+                <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
               @if (form.controls.password.hasError('required') && form.controls.password.touched) {
                 <mat-error>Senha é obrigatória</mat-error>
               }
