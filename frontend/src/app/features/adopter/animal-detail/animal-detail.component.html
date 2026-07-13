@@ -6,7 +6,14 @@
   <div class="detail">
     <div class="detail__hero">
       @if (photos().length) {
-        <img [src]="photos()[photoIdx()]" [alt]="a.name" />
+        @for (url of photos(); track $index) {
+          <img
+            class="detail__photo"
+            [class.detail__photo--active]="photoIdx() === $index"
+            [src]="url"
+            [alt]="a.name"
+          />
+        }
       } @else {
         <div class="detail__placeholder"><mat-icon>pets</mat-icon></div>
       }
