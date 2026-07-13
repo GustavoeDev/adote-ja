@@ -1,0 +1,231 @@
+.requests__header h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.requests__header p {
+  margin: 0.25rem 0 0;
+  color: var(--adoteja-text-muted);
+  font-size: 0.875rem;
+}
+
+.requests__loading,
+.requests__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 4rem 1rem;
+  color: var(--adoteja-text-muted);
+}
+
+.requests__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.request-card {
+  background: var(--adoteja-surface);
+  border: 1px solid rgba(25, 28, 25, 0.09);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.request-card__head {
+  width: 100%;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.request-card__head img,
+.request-card__photo-fallback {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.875rem;
+  object-fit: cover;
+  background: #edf1ed;
+  flex: none;
+}
+
+.request-card__photo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--adoteja-text-muted);
+}
+
+.request-card__meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.request-card__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.request-card__row h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.request-card__meta > p {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--adoteja-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.request-card__meta > p mat-icon {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.request-card__chevron {
+  color: var(--adoteja-text-muted);
+  transition: transform 0.2s ease;
+}
+
+.request-card__chevron--open {
+  transform: rotate(180deg);
+}
+
+.status-badge {
+  display: inline-flex;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge[data-status='pending'] {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.status-badge[data-status='in_progress'] {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.status-badge[data-status='approved'] {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge[data-status='rejected'] {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.request-card__timeline {
+  border-top: 1px solid rgba(25, 28, 25, 0.08);
+  padding: 1rem 1rem 1.25rem;
+}
+
+.timeline-label {
+  margin: 0 0 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--adoteja-text-muted);
+}
+
+.timeline-item {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.timeline-item__rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1.5rem;
+}
+
+.timeline-item__dot {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #edf1ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.timeline-item[data-status='done'] .timeline-item__dot {
+  background: var(--adoteja-primary);
+  color: #fff;
+}
+
+.timeline-item[data-status='current'] .timeline-item__dot {
+  background: #fbbf24;
+  color: #fff;
+}
+
+.timeline-item__dot mat-icon {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.timeline-item__line {
+  width: 2px;
+  flex: 1;
+  min-height: 1.25rem;
+  margin: 0.15rem 0;
+  background: #edf1ed;
+}
+
+.timeline-item[data-status='done'] .timeline-item__line {
+  background: var(--adoteja-primary);
+}
+
+.timeline-item__content {
+  padding-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.timeline-item__content strong {
+  font-size: 0.875rem;
+}
+
+.timeline-item[data-status='pending'] .timeline-item__content strong {
+  color: var(--adoteja-text-muted);
+}
+
+.timeline-item__content span {
+  font-size: 0.75rem;
+  color: var(--adoteja-text-muted);
+}
+
+.rejection {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 0.8rem;
+}

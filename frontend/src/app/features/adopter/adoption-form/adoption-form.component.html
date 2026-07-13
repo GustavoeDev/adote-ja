@@ -1,0 +1,156 @@
+@if (loading()) {
+  <div class="form-loading"><mat-spinner diameter="40"></mat-spinner></div>
+} @else if (animal(); as a) {
+  <div class="wizard">
+    <header class="wizard__header">
+      <button type="button" class="wizard__back" (click)="back()" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Formulário de Adoção</h1>
+        <p>{{ a.name }} · {{ a.breed || 'SRD' }}</p>
+      </div>
+    </header>
+
+    <div class="wizard__steps">
+      @for (label of steps; track label; let i = $index) {
+        <div class="step" [class.step--done]="i + 1 < step()" [class.step--current]="i + 1 === step()">
+          <div class="step__dot">
+            @if (i + 1 < step()) {
+              <mat-icon>check</mat-icon>
+            } @else {
+              {{ i + 1 }}
+            }
+          </div>
+          <span>{{ label }}</span>
+        </div>
+        @if (i < steps.length - 1) {
+          <div class="step__line" [class.step__line--done]="i + 1 < step()"></div>
+        }
+      }
+    </div>
+
+    <form class="wizard__form" [formGroup]="form" (ngSubmit)="submit()">
+      @if (step() === 1) {
+        <h2>Dados Pessoais</h2>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Nome completo</mat-label>
+          <input matInput formControlName="adopter_name" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>CPF</mat-label>
+          <input matInput formControlName="adopter_cpf" placeholder="000.000.000-00" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Telefone</mat-label>
+          <input matInput formControlName="adopter_phone" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>E-mail</mat-label>
+          <input matInput type="email" formControlName="adopter_email" />
+        </mat-form-field>
+      }
+
+      @if (step() === 2) {
+        <h2>Informações de Moradia</h2>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Endereço</mat-label>
+          <input matInput formControlName="adopter_address" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Cidade / Estado</mat-label>
+          <input matInput formControlName="adopter_city" />
+        </mat-form-field>
+
+        <p class="field-label">Tipo de moradia</p>
+        <div class="choice-grid">
+          @for (t of housingTypes; track t) {
+            <button
+              type="button"
+              class="choice"
+              [class.choice--active]="form.controls.housing_type.value === t"
+              (click)="setChoice('housing_type', t)"
+            >
+              {{ t }}
+            </button>
+          }
+        </div>
+
+        <p class="field-label">Tem quintal?</p>
+        <div class="choice-row">
+          @for (v of ['Sim', 'Não']; track v) {
+            <button
+              type="button"
+              class="choice"
+              [class.choice--active]="form.controls.has_yard.value === v"
+              (click)="setChoice('has_yard', v)"
+            >
+              {{ v }}
+            </button>
+          }
+        </div>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Outros animais em casa?</mat-label>
+          <input matInput formControlName="other_pets" placeholder="Ex: 1 gato adulto" />
+        </mat-form-field>
+      }
+
+      @if (step() === 3) {
+        <h2>Motivação e Experiência</h2>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Por que quer adotar {{ a.name }}?</mat-label>
+          <textarea matInput rows="3" formControlName="motivation"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Experiência com animais?</mat-label>
+          <textarea matInput rows="3" formControlName="experience"></textarea>
+        </mat-form-field>
+
+        <p class="field-label">Horas sozinho por dia?</p>
+        <div class="choice-grid choice-grid--3">
+          @for (h of hoursOptions; track h) {
+            <button
+              type="button"
+              class="choice"
+              [class.choice--active]="form.controls.hours_alone.value === h"
+              (click)="setChoice('hours_alone', h)"
+            >
+              {{ h }}
+            </button>
+          }
+        </div>
+      }
+    </form>
+
+    <div class="wizard__footer">
+      @if (step() > 1) {
+        <button mat-stroked-button type="button" (click)="back()">Voltar</button>
+      }
+      @if (step() < 3) {
+        <button mat-flat-button color="primary" type="button" (click)="next()">
+          Continuar
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      } @else {
+        <button mat-flat-button color="primary" type="button" [disabled]="submitting()" (click)="submit()">
+          <mat-icon>check_circle</mat-icon>
+          Enviar
+        </button>
+      }
+    </div>
+  </div>
+}
+
+@if (success()) {
+  <div class="success-overlay">
+    <div class="success-card">
+      <div class="success-card__icon"><mat-icon>check_circle</mat-icon></div>
+      <h3>Solicitação Enviada!</h3>
+      <p>
+        Sua solicitação para adotar <strong>{{ animal()?.name }}</strong> foi enviada. O abrigo entrará em
+        contato em breve.
+      </p>
+    </div>
+  </div>
+}
