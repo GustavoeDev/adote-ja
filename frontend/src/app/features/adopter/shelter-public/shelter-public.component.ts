@@ -7,6 +7,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PublicShelter } from '../../../core/models/adopter.model';
 import { AdopterApiService } from '../../../core/services/adopter-api.service';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { breedSexLine } from '../../../shared/utils/animal-display';
 
 @Component({
   selector: 'app-shelter-public',
@@ -29,6 +30,7 @@ export class ShelterPublicComponent implements OnInit {
 
   readonly loading = signal(true);
   readonly shelter = signal<PublicShelter | null>(null);
+  readonly breedSexLine = breedSexLine;
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
