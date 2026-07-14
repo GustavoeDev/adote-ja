@@ -18,6 +18,7 @@ class AdoptionRequestSerializer(serializers.ModelSerializer):
     date = serializers.SerializerMethodField()
     timeline = TimelineEventSerializer(source='timeline_events', many=True, read_only=True)
     can_decide = serializers.BooleanField(read_only=True)
+    can_review_data = serializers.BooleanField(read_only=True)
     whatsapp_url = serializers.CharField(read_only=True, allow_null=True)
 
     class Meta:
@@ -30,6 +31,8 @@ class AdoptionRequestSerializer(serializers.ModelSerializer):
             'status',
             'interview_phase',
             'interview_completed',
+            'data_reviewed',
+            'can_review_data',
             'can_decide',
             'whatsapp_url',
             'date',
@@ -49,6 +52,7 @@ class AdoptionRequestSerializer(serializers.ModelSerializer):
             'rejection_reason',
             'timeline',
             'created_at',
+            'data_reviewed_at',
             'reviewed_at',
         )
 

@@ -37,6 +37,7 @@ class AdoptionStatusTransitionTests(TestCase):
             adopter_email='adotante@test.com',
         )
         self.request.build_initial_timeline()
+        self.request.approve_data_review()
         self.request.mark_interview_scheduled()
         self.request.advance_to_perform_interview()
         self.request.mark_interview_completed()

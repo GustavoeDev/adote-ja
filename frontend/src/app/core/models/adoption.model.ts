@@ -17,6 +17,8 @@ export interface AdoptionRequest {
   status: AdoptionRequestStatus;
   interview_phase: InterviewPhase;
   interview_completed: boolean;
+  data_reviewed: boolean;
+  can_review_data: boolean;
   can_decide: boolean;
   whatsapp_url: string | null;
   date: string;
@@ -36,5 +38,6 @@ export interface AdoptionRequest {
   rejection_reason: string;
   timeline: TimelineEvent[];
   created_at: string;
+  data_reviewed_at?: string | null;
   reviewed_at: string | null;
 }

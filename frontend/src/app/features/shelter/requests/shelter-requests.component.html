@@ -149,11 +149,29 @@
         </section>
       }
 
-      @if (req.interview_phase === 'to_schedule') {
+      @if (req.can_review_data) {
         <div class="detail-step-actions">
           <p class="detail-step-actions__hint">
-            Entre em contato pelo WhatsApp para combinar a entrevista e, em seguida, confirme o
-            agendamento.
+            Analise o formulário completo enviado pelo adotante antes de seguir para a entrevista.
+          </p>
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="openDataReview()"
+          >
+            <mat-icon>description</mat-icon>
+            Ver dados da solicitação
+          </button>
+        </div>
+      }
+
+      @if (req.data_reviewed && req.status === 'pending' && req.interview_phase === 'to_schedule') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Cadastro aprovado. Entre em contato pelo WhatsApp para combinar a entrevista e, em
+            seguida, confirme o agendamento.
           </p>
           @if (req.whatsapp_url) {
             <button

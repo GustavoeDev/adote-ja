@@ -11,6 +11,10 @@ import {
 } from '../../../core/models/adoption.model';
 import { ShelterApiService } from '../../../core/services/shelter-api.service';
 import { RejectRequestDialogComponent } from './reject-request-dialog.component';
+import {
+  ReviewRequestDataDialogComponent,
+  ReviewDataDialogResult,
+} from './review-request-data-dialog.component';
 
 type RequestFilter = 'all' | AdoptionRequestStatus;
 
@@ -124,6 +128,48 @@ export class ShelterRequestsComponent implements OnInit {
 
   openWhatsApp(url: string): void {
     window.open(url, '_blank', 'noopener');
+  }
+
+  openDataReview(): void {
+    const request = this.selected();
+    if (!request || !request.can_review_data || this.acting()) return;
+
+    const ref = this.dialog.open(ReviewRequestDataDialogComponent, {
+      width: '34rem',
+      maxWidth: '95vw',
+      data: request,
+    });
+
+    ref.afterClosed().subscribe((result?: ReviewDataDialogResult) => {
+      if (result === 'approve') {
+        this.runAction(
+          this.api.approveRequestData(request.id),
+          'Cadastro aprovado. Agora você pode agendar a entrevista.',
+          'Não foi possível aprovar o cadastro.',
+        );
+        return;
+      }
+      if (result === 'reject') {
+        const rejectRef = this.dialog.open(RejectRequestDialogComponent, {
+          width: '26rem',
+          maxWidth: '95vw',
+          data: {
+            adopterName: request.adopter_name,
+            animalName: request.animal_name,
+            title: 'Recusar cadastro',
+            lead: `Informe o motivo da recusa do cadastro de ${request.adopter_name}. O pedido de adoção será encerrado.`,
+          },
+        });
+        rejectRef.afterClosed().subscribe((reason?: string) => {
+          if (!reason) return;
+          this.runAction(
+            this.api.rejectRequestData(request.id, reason),
+            'Cadastro recusado. Pedido encerrado.',
+            'Não foi possível recusar o cadastro.',
+          );
+        });
+      }
+    });
   }
 
   scheduleInterview(): void {

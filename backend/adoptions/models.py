@@ -68,6 +68,8 @@ class AdoptionRequest(models.Model):
     interview_completed = models.BooleanField(default=False)
     interview_scheduled_at = models.DateTimeField(null=True, blank=True)
     interview_completed_at = models.DateTimeField(null=True, blank=True)
+    data_reviewed = models.BooleanField(default=False)
+    data_reviewed_at = models.DateTimeField(null=True, blank=True)
     rejection_reason = models.TextField(blank=True)
     message = models.TextField(blank=True)
     reviewed_at = models.DateTimeField(null=True, blank=True)
@@ -86,6 +88,10 @@ class AdoptionRequest(models.Model):
 
     def __str__(self):
         return f'{self.adopter_name} → {self.animal.name} ({self.status})'
+
+    @property
+    def can_review_data(self) -> bool:
+        return self.status == self.Status.PENDING and not self.data_reviewed
 
     @property
     def can_decide(self) -> bool:
@@ -122,51 +128,128 @@ class AdoptionRequest(models.Model):
 
     def sync_timeline(self):
         """
-        Sempre 4 passos. O 3º muda de rótulo/cor conforme a fase da entrevista:
-        Agendar entrevista (amarelo) → Entrevista agendada (verde) →
-        Realizar entrevista (amarelo) → Entrevista realizada (verde).
+        4 passos:
+        1. Solicitação enviada
+        2. Análise dos dados (só fica concluída após o abrigo revisar o formulário)
+        3. Entrevista (rótulo/cor mutáveis)
+        4. Decisão final
         """
         created = self._fmt(self.created_at)
         scheduled = self._fmt(self.interview_scheduled_at)
         interviewed = self._fmt(self.interview_completed_at)
+        data_reviewed = self._fmt(self.data_reviewed_at)
         reviewed = self._fmt(self.reviewed_at)
         done = TimelineEvent.StepStatus.DONE
         current = TimelineEvent.StepStatus.CURRENT
         pending = TimelineEvent.StepStatus.PENDING
 
         if self.status == self.Status.APPROVED:
+            analysis = ('Análise dos dados', data_reviewed or created, done)
             interview = ('Entrevista realizada', interviewed or reviewed, done)
             decision = ('Adoção aprovada!', reviewed, done)
+        elif self.status == self.Status.REJECTED and not self.data_reviewed:
+            # rejeição precoce — não deveria ocorrer; trata como análise
+            analysis = ('Análise dos dados', reviewed or created, done)
+            interview = ('Agendar entrevista', '—', pending)
+            decision = ('Solicitação recusada', reviewed, done)
+        elif self.status == self.Status.REJECTED and not self.interview_completed:
+            analysis = ('Análise dos dados', data_reviewed or reviewed or created, done)
+            interview = ('Agendar entrevista', '—', pending)
+            decision = ('Solicitação recusada', reviewed, done)
         elif self.status == self.Status.REJECTED:
+            analysis = ('Análise dos dados', data_reviewed or created, done)
             interview = ('Entrevista realizada', interviewed or reviewed, done)
             decision = ('Solicitação recusada', reviewed, done)
+        elif not self.data_reviewed:
+            analysis = ('Análise dos dados', '—', current)
+            interview = ('Agendar entrevista', '—', pending)
+            decision = ('Decisão final', '—', pending)
         elif self.interview_phase == self.InterviewPhase.TO_SCHEDULE:
+            analysis = ('Análise dos dados', data_reviewed, done)
             interview = ('Agendar entrevista', '—', current)
             decision = ('Decisão final', '—', pending)
         elif self.interview_phase == self.InterviewPhase.SCHEDULED:
+            analysis = ('Análise dos dados', data_reviewed, done)
             interview = ('Entrevista agendada', scheduled, done)
             decision = ('Decisão final', '—', pending)
         elif self.interview_phase == self.InterviewPhase.TO_PERFORM:
+            analysis = ('Análise dos dados', data_reviewed, done)
             interview = ('Realizar entrevista', scheduled, current)
             decision = ('Decisão final', '—', pending)
-        else:  # DONE / awaiting decision
+        else:  # DONE / awaiting final decision
+            analysis = ('Análise dos dados', data_reviewed, done)
             interview = ('Entrevista realizada', interviewed, done)
             decision = ('Decisão final', '—', current)
 
         self._replace_timeline([
             ('Solicitação enviada', created, done),
-            ('Análise dos dados', created, done),
+            analysis,
             interview,
             decision,
         ])
 
     def build_initial_timeline(self):
         self.interview_phase = self.InterviewPhase.TO_SCHEDULE
+        self.data_reviewed = False
         self.sync_timeline()
+
+    def approve_data_review(self):
+        if self.status != self.Status.PENDING:
+            raise ValueError('Somente solicitações pendentes podem ter o cadastro analisado.')
+        if self.data_reviewed:
+            raise ValueError('Os dados desta solicitação já foram analisados.')
+
+        now = timezone.now()
+        self.data_reviewed = True
+        self.data_reviewed_at = now
+        self.save(update_fields=['data_reviewed', 'data_reviewed_at', 'updated_at'])
+        self.sync_timeline()
+
+    def reject_data_review(self, reason: str):
+        if self.status != self.Status.PENDING:
+            raise ValueError('Somente solicitações pendentes podem ter o cadastro recusado.')
+        if self.data_reviewed:
+            raise ValueError('Os dados desta solicitação já foram analisados.')
+
+        reason = (reason or '').strip()
+        if not reason:
+            raise ValueError('Informe o motivo da rejeição.')
+        if len(reason) < 5:
+            raise ValueError('O motivo da rejeição deve ter pelo menos 5 caracteres.')
+
+        now = timezone.now()
+        self.data_reviewed = True
+        self.data_reviewed_at = now
+        self.status = self.Status.REJECTED
+        self.rejection_reason = reason
+        self.reviewed_at = now
+        self.save(update_fields=[
+            'data_reviewed',
+            'data_reviewed_at',
+            'status',
+            'rejection_reason',
+            'reviewed_at',
+            'updated_at',
+        ])
+        self.sync_timeline()
+
+        animal = self.animal
+        if animal.status == Animal.Status.ADOPTED:
+            return
+        if self._has_other_active_requests():
+            if animal.status != Animal.Status.IN_PROCESS:
+                animal.status = Animal.Status.IN_PROCESS
+                animal.save(update_fields=['status', 'updated_at'])
+            return
+        if animal.status != Animal.Status.AVAILABLE:
+            animal.status = Animal.Status.AVAILABLE
+            animal.save(update_fields=['status', 'updated_at'])
 
     def mark_interview_scheduled(self):
         if self.status != self.Status.PENDING:
             raise ValueError('Somente solicitações pendentes podem agendar entrevista.')
+        if not self.data_reviewed:
+            raise ValueError('A análise dos dados precisa ser aprovada antes de agendar a entrevista.')
 
         now = timezone.now()
         self.status = self.Status.IN_PROGRESS

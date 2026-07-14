@@ -1,10 +1,12 @@
 from django.urls import path
 
 from adoptions.views import (
+    ShelterAdoptionRequestApproveDataView,
     ShelterAdoptionRequestApproveView,
     ShelterAdoptionRequestCompleteInterviewView,
     ShelterAdoptionRequestDetailView,
     ShelterAdoptionRequestListView,
+    ShelterAdoptionRequestRejectDataView,
     ShelterAdoptionRequestRejectView,
     ShelterAdoptionRequestScheduleInterviewView,
     ShelterAdoptionRequestStartInterviewView,
@@ -13,6 +15,16 @@ from adoptions.views import (
 urlpatterns = [
     path('', ShelterAdoptionRequestListView.as_view(), name='shelter-request-list'),
     path('<int:pk>/', ShelterAdoptionRequestDetailView.as_view(), name='shelter-request-detail'),
+    path(
+        '<int:pk>/approve-data/',
+        ShelterAdoptionRequestApproveDataView.as_view(),
+        name='shelter-request-approve-data',
+    ),
+    path(
+        '<int:pk>/reject-data/',
+        ShelterAdoptionRequestRejectDataView.as_view(),
+        name='shelter-request-reject-data',
+    ),
     path(
         '<int:pk>/schedule-interview/',
         ShelterAdoptionRequestScheduleInterviewView.as_view(),

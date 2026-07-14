@@ -99,6 +99,20 @@ export class ShelterApiService {
     );
   }
 
+  approveRequestData(id: number): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(
+      `${this.apiUrl}/shelter/requests/${id}/approve-data/`,
+      {},
+    );
+  }
+
+  rejectRequestData(id: number, reason: string): Observable<AdoptionRequest> {
+    return this.http.post<AdoptionRequest>(
+      `${this.apiUrl}/shelter/requests/${id}/reject-data/`,
+      { reason },
+    );
+  }
+
   startInterview(id: number): Observable<AdoptionRequest> {
     return this.http.post<AdoptionRequest>(
       `${this.apiUrl}/shelter/requests/${id}/start-interview/`,

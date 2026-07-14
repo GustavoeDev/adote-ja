@@ -8,6 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 export interface RejectRequestDialogData {
   adopterName: string;
   animalName: string;
+  title?: string;
+  lead?: string;
 }
 
 @Component({
@@ -21,12 +23,17 @@ export interface RejectRequestDialogData {
     ReactiveFormsModule,
   ],
   template: `
-    <h2 mat-dialog-title>Recusar solicitação</h2>
+    <h2 mat-dialog-title>{{ data.title || 'Recusar solicitação' }}</h2>
     <mat-dialog-content>
       <p class="lead">
-        Informe o motivo da rejeição do pedido de
-        <strong>{{ data.adopterName }}</strong> para
-        <strong>{{ data.animalName }}</strong>.
+        {{
+          data.lead ||
+            ('Informe o motivo da rejeição do pedido de ' +
+              data.adopterName +
+              ' para ' +
+              data.animalName +
+              '.')
+        }}
       </p>
       <form [formGroup]="form">
         <mat-form-field appearance="outline" class="full">

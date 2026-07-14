@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from accounts.cpf import is_valid_cpf, normalize_cpf
 from accounts.models import AdopterProfile, ShelterProfile
-from animals.models import Animal
+from animals.models import Animal, AnimalMedia
 from animals.serializers import AnimalListSerializer, AnimalMediaSerializer
 
 

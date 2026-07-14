@@ -188,23 +188,31 @@ class Command(BaseCommand):
             req.build_initial_timeline()
 
             stage = data['stage']
-            if stage == 'in_progress':
+            if stage == 'pending':
+                pass
+            elif stage == 'in_progress':
+                req.approve_data_review()
                 req.mark_interview_scheduled()
                 req.advance_to_perform_interview()
             elif stage == 'awaiting_decision':
+                req.approve_data_review()
                 req.mark_interview_scheduled()
                 req.advance_to_perform_interview()
                 req.mark_interview_completed()
             elif stage == 'approved':
+                req.approve_data_review()
                 req.mark_interview_scheduled()
                 req.advance_to_perform_interview()
                 req.mark_interview_completed()
                 req.mark_approved()
             elif stage == 'rejected':
+                req.approve_data_review()
                 req.mark_interview_scheduled()
                 req.advance_to_perform_interview()
                 req.mark_interview_completed()
                 req.mark_rejected('O lar informado não oferece condições adequadas para o animal.')
+            elif stage == 'data_rejected':
+                req.reject_data_review('Cadastro incompleto ou inconsistente com os requisitos do abrigo.')
 
         self.stdout.write(self.style.SUCCESS('Dados de demo do abrigo criados.'))
         self.stdout.write('Abrigo: abrigo@adoteja.com / Abrigo123!')

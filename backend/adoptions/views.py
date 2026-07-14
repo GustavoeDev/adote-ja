@@ -64,6 +64,35 @@ class ShelterAdoptionRequestDetailView(APIView):
         return Response(AdoptionRequestSerializer(obj, context={'request': request}).data)
 
 
+class ShelterAdoptionRequestApproveDataView(APIView):
+    permission_classes = [IsAuthenticated, IsShelter]
+
+    def post(self, request, pk):
+        obj = get_shelter_request(request, pk)
+        if not obj:
+            return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            obj.approve_data_review()
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))
+
+
+class ShelterAdoptionRequestRejectDataView(APIView):
+    permission_classes = [IsAuthenticated, IsShelter]
+
+    def post(self, request, pk):
+        obj = get_shelter_request(request, pk)
+        if not obj:
+            return Response({'detail': 'Solicitação não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        reason = request.data.get('reason', '')
+        try:
+            obj.reject_data_review(reason)
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize_request(obj, request))
+
+
 class ShelterAdoptionRequestScheduleInterviewView(APIView):
     permission_classes = [IsAuthenticated, IsShelter]
 
