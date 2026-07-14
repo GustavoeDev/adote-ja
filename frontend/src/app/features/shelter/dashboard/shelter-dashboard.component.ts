@@ -55,7 +55,7 @@ export class ShelterDashboardComponent implements OnInit {
     this.loading.set(true);
     forkJoin({
       dashboard: this.api.getDashboard(),
-      animals: this.api.listAnimals(),
+      animals: this.api.listAnimals({ isActive: true }),
     }).subscribe({
       next: ({ dashboard, animals }) => {
         this.dashboard.set(dashboard);
@@ -85,7 +85,7 @@ export class ShelterDashboardComponent implements OnInit {
     this.closeMenu();
     const ref = this.dialog.open(ConfirmInactivateDialogComponent, {
       width: 'min(100% - 2rem, 400px)',
-      data: { name: animal.name },
+      data: { name: animal.name, action: 'inactivate' as const },
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;

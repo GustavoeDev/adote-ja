@@ -12,6 +12,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 import { breedLabel } from '../../../shared/utils/animal-display';
 import { ConfirmInactivateDialogComponent } from '../dashboard/confirm-inactivate-dialog.component';
 
+type ActivityFilter = 'active' | 'inactive';
 type SpeciesFilter = 'all' | AnimalSpecies;
 
 @Component({
@@ -36,9 +37,15 @@ export class AnimalsListComponent implements OnInit {
 
   readonly loading = signal(true);
   readonly animals = signal<Animal[]>([]);
+  readonly activityFilter = signal<ActivityFilter>('active');
   readonly filter = signal<SpeciesFilter>('all');
   readonly openMenuId = signal<number | null>(null);
   readonly breedLabel = breedLabel;
+
+  readonly activityFilters: { id: ActivityFilter; label: string }[] = [
+    { id: 'active', label: 'Ativos' },
+    { id: 'inactive', label: 'Inativos' },
+  ];
 
   readonly filters: { id: SpeciesFilter; label: string; icon: string }[] = [
     { id: 'all', label: 'Todos', icon: 'all_inclusive' },
@@ -70,7 +77,8 @@ export class AnimalsListComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.api.listAnimals().subscribe({
+    const isActive = this.activityFilter() === 'active';
+    this.api.listAnimals({ isActive }).subscribe({
       next: (animals) => {
         this.animals.set(animals);
         this.loading.set(false);
@@ -83,6 +91,14 @@ export class AnimalsListComponent implements OnInit {
         });
       },
     });
+  }
+
+  setActivityFilter(value: ActivityFilter): void {
+    if (this.activityFilter() === value) return;
+    this.activityFilter.set(value);
+    this.filter.set('all');
+    this.closeMenu();
+    this.load();
   }
 
   setFilter(value: SpeciesFilter): void {
@@ -112,7 +128,7 @@ export class AnimalsListComponent implements OnInit {
     this.closeMenu();
     const ref = this.dialog.open(ConfirmInactivateDialogComponent, {
       width: 'min(100% - 2rem, 400px)',
-      data: { name: animal.name },
+      data: { name: animal.name, action: 'inactivate' as const },
     });
     ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
@@ -126,6 +142,32 @@ export class AnimalsListComponent implements OnInit {
         },
         error: () => {
           this.snackBar.open('Erro ao inativar animal.', 'Fechar', {
+            duration: 4000,
+            panelClass: 'snackbar-error',
+          });
+        },
+      });
+    });
+  }
+
+  confirmActivate(animal: Animal): void {
+    this.closeMenu();
+    const ref = this.dialog.open(ConfirmInactivateDialogComponent, {
+      width: 'min(100% - 2rem, 400px)',
+      data: { name: animal.name, action: 'activate' as const },
+    });
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) return;
+      this.api.activateAnimal(animal.id).subscribe({
+        next: () => {
+          this.snackBar.open('Animal reativado.', 'Fechar', {
+            duration: 3000,
+            panelClass: 'snackbar-success',
+          });
+          this.load();
+        },
+        error: () => {
+          this.snackBar.open('Erro ao reativar animal.', 'Fechar', {
             duration: 4000,
             panelClass: 'snackbar-error',
           });

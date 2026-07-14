@@ -2,9 +2,25 @@
   <header class="animals-page__header">
     <div>
       <h1>Meus Animais</h1>
-      <p>{{ animals().length }} cadastrado(s)</p>
+      <p>
+        {{ animals().length }}
+        {{ activityFilter() === 'active' ? 'ativo(s)' : 'inativo(s)' }}
+      </p>
     </div>
   </header>
+
+  <div class="activity-tabs" role="tablist" aria-label="Filtrar por situação">
+    @for (item of activityFilters; track item.id) {
+      <button
+        type="button"
+        class="activity-tab"
+        [class.activity-tab--active]="activityFilter() === item.id"
+        (click)="setActivityFilter(item.id)"
+      >
+        {{ item.label }}
+      </button>
+    }
+  </div>
 
   <div class="filters" role="tablist" aria-label="Filtrar por espécie">
     @for (item of filters; track item.id) {
@@ -29,13 +45,15 @@
     <div class="animals-page__empty surface-card">
       <mat-icon>pets</mat-icon>
       <p>
-        @if (filter() === 'all') {
-          Nenhum animal cadastrado ainda.
+        @if (activityFilter() === 'inactive') {
+          Nenhum animal inativo.
+        } @else if (filter() === 'all') {
+          Nenhum animal ativo.
         } @else {
           Nenhum animal nesta espécie.
         }
       </p>
-      @if (filter() === 'all') {
+      @if (activityFilter() === 'active' && filter() === 'all') {
         <button mat-flat-button color="primary" type="button" (click)="onFabClick()">
           Cadastrar animal
         </button>
@@ -79,14 +97,25 @@
                   <mat-icon>edit</mat-icon>
                   Editar
                 </button>
-                <button
-                  type="button"
-                  class="animal-row__dropdown-item animal-row__dropdown-item--danger"
-                  (click)="confirmInactivate(animal)"
-                >
-                  <mat-icon>block</mat-icon>
-                  Inativar
-                </button>
+                @if (animal.is_active) {
+                  <button
+                    type="button"
+                    class="animal-row__dropdown-item animal-row__dropdown-item--danger"
+                    (click)="confirmInactivate(animal)"
+                  >
+                    <mat-icon>block</mat-icon>
+                    Inativar
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="animal-row__dropdown-item animal-row__dropdown-item--active"
+                    (click)="confirmActivate(animal)"
+                  >
+                    <mat-icon>check_circle</mat-icon>
+                    Reativar
+                  </button>
+                }
               </div>
             }
           </div>

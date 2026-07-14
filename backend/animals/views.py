@@ -18,10 +18,12 @@ class AnimalListCreateView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get(self, request):
-        animals = Animal.objects.filter(
-            shelter=request.user.shelter_profile,
-            is_active=True,
-        )
+        animals = Animal.objects.filter(shelter=request.user.shelter_profile)
+        is_active = request.query_params.get('is_active')
+        if is_active in ('true', '1'):
+            animals = animals.filter(is_active=True)
+        elif is_active in ('false', '0'):
+            animals = animals.filter(is_active=False)
         species = request.query_params.get('species')
         if species:
             animals = animals.filter(species=species)
@@ -79,6 +81,20 @@ class AnimalInactivateView(APIView):
         animal.is_active = False
         animal.save(update_fields=['is_active', 'updated_at'])
         return Response({'message': 'Animal inativado.'}, status=status.HTTP_200_OK)
+
+
+class AnimalActivateView(APIView):
+    permission_classes = [IsAuthenticated, IsShelter]
+
+    def post(self, request, pk):
+        try:
+            animal = Animal.objects.get(pk=pk, shelter=request.user.shelter_profile)
+        except Animal.DoesNotExist:
+            return Response({'detail': 'Animal não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        animal.is_active = True
+        animal.save(update_fields=['is_active', 'updated_at'])
+        return Response({'message': 'Animal reativado.'}, status=status.HTTP_200_OK)
 
 
 class AnimalMediaView(APIView):

@@ -15,14 +15,14 @@ class ShelterDashboardView(APIView):
 
     def get(self, request):
         profile = request.user.shelter_profile
-        animals = Animal.objects.filter(shelter=profile, is_active=True)
-        requests_count = AdoptionRequest.objects.filter(animal__shelter=profile).count()
+        animals = Animal.objects.filter(shelter=profile)
+        requests = AdoptionRequest.objects.filter(animal__shelter=profile)
         return Response({
             'shelter_name': profile.name,
             'total_animals': animals.count(),
-            'available': animals.filter(status=Animal.Status.AVAILABLE).count(),
-            'in_process': animals.filter(status=Animal.Status.IN_PROCESS).count(),
-            'requests_count': requests_count,
+            'pending_requests': requests.filter(status=AdoptionRequest.Status.PENDING).count(),
+            'in_progress_requests': requests.filter(status=AdoptionRequest.Status.IN_PROGRESS).count(),
+            'adopted_animals': animals.filter(status=Animal.Status.ADOPTED).count(),
         })
 
 

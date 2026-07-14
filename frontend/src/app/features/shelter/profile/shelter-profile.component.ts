@@ -70,7 +70,7 @@ export class ShelterProfileComponent implements OnInit {
     this.loading.set(true);
     forkJoin({
       profile: this.api.getProfile(),
-      animals: this.api.listAnimals(),
+      animals: this.api.listAnimals({ isActive: true }),
     }).subscribe({
       next: ({ profile, animals }) => {
         this.applyProfile(profile);

@@ -57,9 +57,9 @@ export interface AnimalWritePayload {
 export interface ShelterDashboard {
   shelter_name: string;
   total_animals: number;
-  available: number;
-  in_process: number;
-  requests_count: number;
+  pending_requests: number;
+  in_progress_requests: number;
+  adopted_animals: number;
 }
 
 export interface ShelterProfile {

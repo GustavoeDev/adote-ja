@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -42,9 +42,12 @@ export class ShelterApiService {
     return this.http.post<ShelterProfile>(`${this.apiUrl}/shelter/profile/avatar/`, formData);
   }
 
-  listAnimals(species?: string): Observable<Animal[]> {
-    const params = species ? `?species=${species}` : '';
-    return this.http.get<Animal[]>(`${this.apiUrl}/animals/${params}`);
+  listAnimals(options?: { species?: string; isActive?: boolean }): Observable<Animal[]> {
+    let params = new HttpParams();
+    if (options?.species) params = params.set('species', options.species);
+    if (options?.isActive === true) params = params.set('is_active', 'true');
+    if (options?.isActive === false) params = params.set('is_active', 'false');
+    return this.http.get<Animal[]>(`${this.apiUrl}/animals/`, { params });
   }
 
   getAnimal(id: number): Observable<AnimalDetail> {
@@ -61,6 +64,10 @@ export class ShelterApiService {
 
   inactivateAnimal(id: number): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/animals/${id}/inactivate/`, {});
+  }
+
+  activateAnimal(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/animals/${id}/activate/`, {});
   }
 
   uploadMedia(animalId: number, files: File[], coverIndex?: number | null): Observable<AnimalDetail> {

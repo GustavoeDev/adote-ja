@@ -24,25 +24,25 @@
         <p class="metric-card__label">Total de Animais</p>
       </div>
       <div class="metric-card">
-        <div class="metric-card__icon metric-card__icon--green">
-          <mat-icon>favorite</mat-icon>
-        </div>
-        <p class="metric-card__value">{{ dashboard()?.available ?? 0 }}</p>
-        <p class="metric-card__label">Em Adoção</p>
-      </div>
-      <div class="metric-card">
         <div class="metric-card__icon metric-card__icon--amber">
-          <mat-icon>schedule</mat-icon>
+          <mat-icon>assignment</mat-icon>
         </div>
-        <p class="metric-card__value">{{ dashboard()?.in_process ?? 0 }}</p>
-        <p class="metric-card__label">Em Processo</p>
+        <p class="metric-card__value">{{ dashboard()?.pending_requests ?? 0 }}</p>
+        <p class="metric-card__label">Pedidos Pendentes</p>
       </div>
       <div class="metric-card">
         <div class="metric-card__icon metric-card__icon--blue">
-          <mat-icon>assignment</mat-icon>
+          <mat-icon>hourglass_top</mat-icon>
         </div>
-        <p class="metric-card__value">{{ dashboard()?.requests_count ?? 0 }}</p>
-        <p class="metric-card__label">Pedidos</p>
+        <p class="metric-card__value">{{ dashboard()?.in_progress_requests ?? 0 }}</p>
+        <p class="metric-card__label">Pedidos em Andamento</p>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon metric-card__icon--green">
+          <mat-icon>favorite</mat-icon>
+        </div>
+        <p class="metric-card__value">{{ dashboard()?.adopted_animals ?? 0 }}</p>
+        <p class="metric-card__label">Animais Adotados</p>
       </div>
     </section>
 
@@ -60,7 +60,7 @@
       @if (animals().length === 0) {
         <div class="animals__empty surface-card">
           <mat-icon>pets</mat-icon>
-          <p>Nenhum animal cadastrado ainda.</p>
+          <p>Nenhum animal ativo.</p>
         </div>
       } @else {
         <ul class="animals__list">
