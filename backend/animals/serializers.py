@@ -33,7 +33,7 @@ class AnimalListSerializer(serializers.ModelSerializer):
         ]
 
     def get_cover_photo_url(self, obj):
-        cover = obj.media.filter(is_cover=True).first() or obj.media.first()
+        cover = obj.media.filter(is_cover=True, media_type=AnimalMedia.MediaType.PHOTO).first()
         if cover and cover.file:
             request = self.context.get('request')
             if request:

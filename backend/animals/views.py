@@ -100,9 +100,25 @@ class AnimalMediaView(APIView):
         if not uploaded:
             return Response({'detail': 'Nenhum arquivo enviado.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        cover_index_raw = request.data.get('cover_index')
+        cover_index = None
+        if cover_index_raw is not None and cover_index_raw != '':
+            try:
+                cover_index = int(cover_index_raw)
+            except (TypeError, ValueError):
+                return Response(
+                    {'detail': 'cover_index inválido.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if cover_index < 0 or cover_index >= len(uploaded):
+                return Response(
+                    {'detail': 'cover_index fora do intervalo dos arquivos enviados.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         created = []
-        has_cover = animal.media.filter(is_cover=True).exists()
         base_order = animal.media.count()
+        cover_media = None
 
         for i, f in enumerate(uploaded):
             if f.size > MAX_FILE_SIZE:
@@ -122,17 +138,28 @@ class AnimalMediaView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            make_cover = not has_cover and i == 0 and media_type == AnimalMedia.MediaType.PHOTO
+            make_cover = cover_index is not None and i == cover_index
+            if make_cover and media_type != AnimalMedia.MediaType.PHOTO:
+                return Response(
+                    {'detail': 'A capa deve ser uma imagem.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             media = AnimalMedia.objects.create(
                 animal=animal,
                 file=f,
                 media_type=media_type,
-                is_cover=make_cover,
+                is_cover=False,
                 order=base_order + i,
             )
             if make_cover:
-                has_cover = True
+                cover_media = media
             created.append(media)
+
+        if cover_media:
+            animal.media.filter(is_cover=True).update(is_cover=False)
+            cover_media.is_cover = True
+            cover_media.save(update_fields=['is_cover'])
 
         animal.refresh_from_db()
         return Response(
@@ -151,16 +178,8 @@ class AnimalMediaDeleteView(APIView):
         except (Animal.DoesNotExist, AnimalMedia.DoesNotExist):
             return Response({'detail': 'Mídia não encontrada.'}, status=status.HTTP_404_NOT_FOUND)
 
-        was_cover = media.is_cover
         media.file.delete(save=False)
         media.delete()
-
-        if was_cover:
-            first_photo = animal.media.filter(media_type=AnimalMedia.MediaType.PHOTO).first()
-            first = first_photo or animal.media.first()
-            if first:
-                first.is_cover = True
-                first.save(update_fields=['is_cover'])
 
         return Response(AnimalDetailSerializer(animal, context={'request': request}).data)
 

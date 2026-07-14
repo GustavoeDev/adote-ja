@@ -1,5 +1,6 @@
 <div class="uploader">
   <p class="uploader__label">Fotos e vídeos</p>
+  <p class="uploader__hint">Toque em uma imagem para definir a capa do animal.</p>
 
   <div
     class="uploader__dropzone"
@@ -62,7 +63,7 @@
       }
 
       @for (pending of pendingFiles(); track pending.id) {
-        <div class="thumb thumb--pending">
+        <div class="thumb thumb--pending" [class.thumb--cover]="pending.isCover">
           @if (isPhoto(pending.mediaType)) {
             <img [src]="pending.previewUrl" [alt]="pending.file.name" />
           } @else {
@@ -79,7 +80,19 @@
           >
             <mat-icon>close</mat-icon>
           </button>
-          <span class="thumb__pending-label">Novo</span>
+          @if (pending.isCover) {
+            <span class="thumb__cover-label">Capa</span>
+          } @else if (isPhoto(pending.mediaType)) {
+            <button
+              type="button"
+              class="thumb__set-cover"
+              (click)="pendingCoverSelected.emit(pending.id); $event.stopPropagation()"
+            >
+              Definir capa
+            </button>
+          } @else {
+            <span class="thumb__pending-label">Novo</span>
+          }
         </div>
       }
     </div>

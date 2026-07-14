@@ -158,8 +158,20 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
       file,
       previewUrl: URL.createObjectURL(file),
       mediaType: (file.type.startsWith('video/') ? 'video' : 'photo') as 'photo' | 'video',
+      isCover: false,
     }));
     this.pendingFiles.update((list) => [...list, ...next]);
+  }
+
+  onPendingCoverSelected(pendingId: string): void {
+    this.pendingFiles.update((list) =>
+      list.map((p) => ({
+        ...p,
+        isCover: p.id === pendingId && p.mediaType === 'photo',
+      })),
+    );
+    // Visual: só uma capa. A definitiva é aplicada no upload via cover_index.
+    this.existingMedia.update((list) => list.map((m) => ({ ...m, is_cover: false })));
   }
 
   onPendingRemoved(id: string): void {
@@ -190,6 +202,7 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
   onCoverSelected(mediaId: number): void {
     const animalId = this.animalId();
     if (!animalId) return;
+    this.pendingFiles.update((list) => list.map((p) => ({ ...p, isCover: false })));
     this.api.setCover(animalId, mediaId).subscribe({
       next: (animal) => this.existingMedia.set(animal.media),
       error: (err) => {
@@ -229,7 +242,10 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
 
     this.loading.set(true);
     const animalId = this.animalId();
-    const pending = this.pendingFiles().map((p) => p.file);
+    const pending = this.pendingFiles();
+    const pendingFiles = pending.map((p) => p.file);
+    const coverIndex = pending.findIndex((p) => p.isCover);
+    const coverIndexOrNull = coverIndex >= 0 ? coverIndex : null;
 
     const save$ = animalId
       ? this.api.updateAnimal(animalId, payload)
@@ -238,10 +254,10 @@ export class AnimalFormComponent implements OnInit, OnDestroy {
     save$
       .pipe(
         switchMap((animal) => {
-          if (!pending.length) {
+          if (!pendingFiles.length) {
             return of(animal);
           }
-          return this.api.uploadMedia(animal.id, pending);
+          return this.api.uploadMedia(animal.id, pendingFiles, coverIndexOrNull);
         }),
       )
       .subscribe({

@@ -90,4 +90,5 @@ export interface PendingMediaFile {
   file: File;
   previewUrl: string;
   mediaType: MediaType;
+  isCover: boolean;
 }

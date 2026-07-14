@@ -18,6 +18,7 @@ export class MediaUploaderComponent {
   readonly pendingRemoved = output<string>();
   readonly existingRemoved = output<number>();
   readonly coverSelected = output<number>();
+  readonly pendingCoverSelected = output<string>();
 
   readonly dragging = signal(false);
 

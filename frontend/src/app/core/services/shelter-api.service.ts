@@ -63,9 +63,12 @@ export class ShelterApiService {
     return this.http.post<{ message: string }>(`${this.apiUrl}/animals/${id}/inactivate/`, {});
   }
 
-  uploadMedia(animalId: number, files: File[]): Observable<AnimalDetail> {
+  uploadMedia(animalId: number, files: File[], coverIndex?: number | null): Observable<AnimalDetail> {
     const formData = new FormData();
     files.forEach((file) => formData.append('files', file));
+    if (coverIndex !== undefined && coverIndex !== null) {
+      formData.append('cover_index', String(coverIndex));
+    }
     return this.http.post<AnimalDetail>(`${this.apiUrl}/animals/${animalId}/media/`, formData);
   }
 
