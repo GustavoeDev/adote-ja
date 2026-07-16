@@ -80,6 +80,7 @@ export interface ConfirmActivityDialogData {
     mat-dialog-actions {
       gap: 0.5rem;
       padding: 0 1.5rem 1.25rem;
+      margin-top: 1rem;
     }
   `,
 })

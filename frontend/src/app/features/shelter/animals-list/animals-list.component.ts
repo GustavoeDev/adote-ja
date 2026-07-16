@@ -1,5 +1,4 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -19,7 +18,6 @@ type SpeciesFilter = 'all' | AnimalSpecies;
   selector: 'app-animals-list',
   standalone: true,
   imports: [
-    MatButtonModule,
     MatDialogModule,
     MatIconModule,
     MatProgressSpinnerModule,

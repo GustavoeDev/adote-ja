@@ -80,7 +80,7 @@
             <mat-icon>close</mat-icon>
             Cancelar
           </button>
-          <button class="profile__save-btn" type="button" (click)="save()" [disabled]="saving()">
+          <button class="btn-primary profile__save-btn" type="button" (click)="save()" [disabled]="saving()">
             @if (saving()) {
               <mat-spinner diameter="18"></mat-spinner>
             } @else {
@@ -89,7 +89,7 @@
             }
           </button>
         } @else {
-          <button type="button" class="profile__edit-btn" (click)="startEdit()">
+          <button type="button" class="btn-primary profile__edit-btn" (click)="startEdit()">
             <mat-icon>edit</mat-icon>
             Editar perfil
           </button>

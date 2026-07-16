@@ -121,33 +121,38 @@
   color: #fff;
 }
 
-.profile__edit-btn, .profile__save-btn, .profile__cancel-btn {
-  border-radius: 0.875rem !important;
-  font-weight: 700;
-  background: var(--adoteja-primary);
-  border: none;
-  color: #fff;
-  cursor: pointer;
+.profile__edit-btn,
+.profile__save-btn {
   padding: 0.75rem 1rem;
-  display: flex;
+}
+
+.profile__cancel-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(25, 28, 25, 0.12);
+  color: var(--adoteja-text-muted);
+  cursor: pointer;
 }
 
-.profile__save-btn mat-icon, .profile__cancel-btn mat-icon {
-  font-size: 1rem;
-  width: 1rem;
-  height: 1rem;
-  color: #fff;
+.profile__cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
+.profile__save-btn mat-icon,
+.profile__cancel-btn mat-icon,
 .profile__edit-btn mat-icon {
   font-size: 1rem;
   width: 1rem;
   height: 1rem;
-  margin-right: 0.25rem;
-  color: #fff;
 }
 
 .profile__identity {

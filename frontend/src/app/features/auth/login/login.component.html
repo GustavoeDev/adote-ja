@@ -24,7 +24,7 @@
               · {{ auth.user()?.shelter_name }}
             }
           </p>
-          <button type="button" class="full-width submit-btn" (click)="logout()">
+          <button type="button" class="full-width btn-primary" (click)="logout()">
             Sair
           </button>
         </div>
@@ -67,7 +67,7 @@
               }
             </mat-form-field>
 
-            <button color="primary" type="submit" class="full-width submit-btn" [disabled]="loading()">
+            <button type="submit" class="full-width btn-primary" [disabled]="loading()">
               @if (loading()) {
                 <mat-spinner diameter="20"></mat-spinner>
               } @else {

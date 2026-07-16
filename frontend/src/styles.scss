@@ -1,5 +1,20 @@
 @use '@angular/material' as mat;
 
+:root {
+  --adoteja-primary: #1e6f50;
+  --adoteja-primary-dark: #155a40;
+  --adoteja-primary-light: #e6f4ec;
+  --adoteja-accent: #ff8f00;
+  --adoteja-bg: #f5f8f5;
+  --adoteja-surface: #ffffff;
+  --adoteja-text-muted: #5d6f5d;
+  --adoteja-radius: 14px;
+  --adoteja-nav-height: 64px;
+  --adoteja-sidebar-width: 280px;
+  --content-max: 1100px;
+  --content-form: 440px;
+}
+
 html {
   @include mat.theme(
     (
@@ -17,21 +32,14 @@ html {
       ),
     )
   );
-}
 
-:root {
-  --adoteja-primary: #1e6f50;
-  --adoteja-primary-dark: #155a40;
-  --adoteja-primary-light: #e6f4ec;
-  --adoteja-accent: #ff8f00;
-  --adoteja-bg: #f5f8f5;
-  --adoteja-surface: #ffffff;
-  --adoteja-text-muted: #5d6f5d;
-  --adoteja-radius: 14px;
-  --adoteja-nav-height: 64px;
-  --adoteja-sidebar-width: 280px;
-  --content-max: 1100px;
-  --content-form: 440px;
+  /* Alinha o primary do Material à marca AdoteJá */
+  --mat-sys-primary: var(--adoteja-primary);
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: var(--adoteja-primary-light);
+  --mat-sys-on-primary-container: var(--adoteja-primary-dark);
+  --mat-sys-primary-fixed: var(--adoteja-primary-light);
+  --mat-sys-on-primary-fixed: var(--adoteja-primary-dark);
 }
 
 *,
@@ -390,4 +398,66 @@ mat-form-field.full-width {
 .snackbar-success {
   --mdc-snackbar-container-color: var(--adoteja-primary);
   --mdc-snackbar-supporting-text-color: #fff;
+}
+
+/* Botão de confirmação nativo (ex.: Cadastrar animal, Entrar) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 48px;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.875rem;
+  background-color: var(--adoteja-primary);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--adoteja-primary-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Material flat/filled primary — mesmo verde e cantos do btn-primary */
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-protected-button.mat-primary {
+  --mdc-filled-button-container-color: var(--adoteja-primary);
+  --mdc-filled-button-label-text-color: #fff;
+  --mdc-protected-button-container-color: var(--adoteja-primary);
+  --mdc-protected-button-label-text-color: #fff;
+  --mat-button-filled-container-color: var(--adoteja-primary);
+  --mat-button-filled-label-text-color: #fff;
+  --mat-button-protected-container-color: var(--adoteja-primary);
+  --mat-button-protected-label-text-color: #fff;
+  border-radius: 0.875rem !important;
+  font-weight: 700 !important;
+}
+
+.mat-mdc-unelevated-button.mat-primary:hover:not(:disabled),
+.mat-mdc-raised-button.mat-primary:hover:not(:disabled),
+.mat-mdc-protected-button.mat-primary:hover:not(:disabled) {
+  --mdc-filled-button-container-color: var(--adoteja-primary-dark);
+  --mdc-protected-button-container-color: var(--adoteja-primary-dark);
+  --mat-button-filled-container-color: var(--adoteja-primary-dark);
+  --mat-button-protected-container-color: var(--adoteja-primary-dark);
+}
+
+.mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-label-text-color: var(--adoteja-primary);
+  --mdc-outlined-button-outline-color: rgba(30, 111, 80, 0.45);
+  --mat-button-outlined-label-text-color: var(--adoteja-primary);
+  --mat-button-outlined-outline-color: rgba(30, 111, 80, 0.45);
+  border-radius: 0.875rem !important;
+  font-weight: 700 !important;
 }
