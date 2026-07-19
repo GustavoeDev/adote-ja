@@ -1,0 +1,130 @@
+<div class="animals-page" (click)="closeMenu()">
+  <header class="animals-page__header">
+    <div>
+      <h1>Meus Animais</h1>
+      <p>
+        {{ animals().length }}
+        {{ activityFilter() === 'active' ? 'ativo(s)' : 'inativo(s)' }}
+      </p>
+    </div>
+  </header>
+
+  <div class="activity-tabs" role="tablist" aria-label="Filtrar por situação">
+    @for (item of activityFilters; track item.id) {
+      <button
+        type="button"
+        class="activity-tab"
+        [class.activity-tab--active]="activityFilter() === item.id"
+        (click)="setActivityFilter(item.id)"
+      >
+        {{ item.label }}
+      </button>
+    }
+  </div>
+
+  <div class="filters" role="tablist" aria-label="Filtrar por espécie">
+    @for (item of filters; track item.id) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="filter() === item.id"
+        (click)="setFilter(item.id)"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+        <span class="filter-chip__count">{{ countFor(item.id) }}</span>
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="animals-page__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (filteredAnimals().length === 0) {
+    <div class="animals-page__empty surface-card">
+      <mat-icon>pets</mat-icon>
+      <p>
+        @if (activityFilter() === 'inactive') {
+          Nenhum animal inativo.
+        } @else if (filter() === 'all') {
+          Nenhum animal ativo.
+        } @else {
+          Nenhum animal nesta espécie.
+        }
+      </p>
+      @if (activityFilter() === 'active' && filter() === 'all') {
+        <button type="button" class="btn-primary" (click)="onFabClick()">
+          Cadastrar animal
+        </button>
+      }
+    </div>
+  } @else {
+    <ul class="animals__list">
+      @for (animal of filteredAnimals(); track animal.id) {
+        <li class="animal-row">
+          <div class="animal-row__thumb">
+            @if (animal.cover_photo_url) {
+              <img [src]="animal.cover_photo_url" [alt]="animal.name" />
+            } @else {
+              <mat-icon>pets</mat-icon>
+            }
+          </div>
+          <div class="animal-row__info">
+            <div class="animal-row__title">
+              <span class="animal-row__name">{{ animal.name }}</span>
+              <app-status-badge [status]="animal.status" />
+            </div>
+            <p class="animal-row__meta">
+              {{ breedLabel(animal.breed) }}
+              @if (animal.age_text) {
+                · {{ animal.age_text }}
+              }
+            </p>
+          </div>
+          <div class="animal-row__menu" (click)="$event.stopPropagation()">
+            <button
+              type="button"
+              class="animal-row__menu-btn"
+              [attr.aria-expanded]="openMenuId() === animal.id"
+              (click)="toggleMenu(animal.id, $event)"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            @if (openMenuId() === animal.id) {
+              <div class="animal-row__dropdown">
+                <button type="button" class="animal-row__dropdown-item" (click)="editAnimal(animal)">
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+                @if (animal.is_active) {
+                  <button
+                    type="button"
+                    class="animal-row__dropdown-item animal-row__dropdown-item--danger"
+                    (click)="confirmInactivate(animal)"
+                  >
+                    <mat-icon>block</mat-icon>
+                    Inativar
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="animal-row__dropdown-item animal-row__dropdown-item--active"
+                    (click)="confirmActivate(animal)"
+                  >
+                    <mat-icon>check_circle</mat-icon>
+                    Reativar
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  <button type="button" class="fab" aria-label="Novo animal" (click)="onFabClick()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

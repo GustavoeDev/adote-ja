@@ -1,0 +1,89 @@
+import { Component } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+
+@Component({
+  selector: 'app-shelter-bottom-nav',
+  standalone: true,
+  imports: [MatIconModule, RouterLink, RouterLinkActive],
+  template: `
+    <nav class="bottom-nav" aria-label="Navegação do abrigo">
+      <a routerLink="/abrigo/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a
+        routerLink="/abrigo/animais"
+        routerLinkActive="bottom-nav__item--active"
+        class="bottom-nav__item"
+      >
+        <mat-icon>pets</mat-icon>
+        <span>Animais</span>
+      </a>
+      <a
+        routerLink="/abrigo/pedidos"
+        routerLinkActive="bottom-nav__item--active"
+        class="bottom-nav__item"
+      >
+        <mat-icon>assignment</mat-icon>
+        <span>Pedidos</span>
+      </a>
+      <a routerLink="/abrigo/perfil" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <mat-icon>home_work</mat-icon>
+        <span>Perfil</span>
+      </a>
+    </nav>
+  `,
+  styles: `
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: var(--adoteja-nav-height);
+      background: var(--adoteja-surface);
+      border-top: 1px solid rgba(25, 28, 25, 0.09);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bottom-nav__item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.125rem;
+      min-height: 48px;
+      border: none;
+      background: transparent;
+      color: var(--adoteja-text-muted);
+      text-decoration: none;
+      font-size: 0.625rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .bottom-nav__item mat-icon {
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .bottom-nav__item--active {
+      color: var(--adoteja-primary);
+    }
+
+    @media (min-width: 768px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+  `,
+})
+export class ShelterBottomNavComponent {}

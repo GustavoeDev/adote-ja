@@ -1,0 +1,86 @@
+@if (loading()) {
+  <div class="shelter-loading"><mat-spinner diameter="40"></mat-spinner></div>
+} @else if (shelter(); as s) {
+  <div class="shelter">
+    <div class="shelter__cover-wrap">
+      <div class="shelter__cover">
+        @if (s.cover_photo_url) {
+          <img [src]="s.cover_photo_url" [alt]="'Capa de ' + s.name" />
+        }
+      </div>
+      <button type="button" class="shelter__back" (click)="goBack()" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="shelter__avatar">
+        @if (s.profile_photo_url) {
+          <img [src]="s.profile_photo_url" [alt]="s.name" />
+        } @else {
+          <span>{{ s.initials }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="shelter__body">
+      <div class="shelter__identity">
+        <div>
+          <h1>
+            {{ s.name }}
+            @if (s.is_verified) {
+              <mat-icon class="verified">verified</mat-icon>
+            }
+          </h1>
+          <p>
+            <mat-icon>location_on</mat-icon>
+            {{ s.city || 'Cidade não informada' }}
+          </p>
+        </div>
+      </div>
+
+      @if (s.about) {
+        <section>
+          <h2>Sobre</h2>
+          <p class="shelter__about">{{ s.about }}</p>
+        </section>
+      }
+
+      <section class="shelter__contacts">
+        @if (s.public_email) {
+          <a [href]="'mailto:' + s.public_email"><mat-icon>mail</mat-icon>{{ s.public_email }}</a>
+        }
+        @if (s.public_phone) {
+          <a [href]="'tel:' + s.public_phone"><mat-icon>phone</mat-icon>{{ s.public_phone }}</a>
+        }
+        @if (s.website) {
+          <a [href]="s.website" target="_blank" rel="noopener"><mat-icon>language</mat-icon>Site</a>
+        }
+      </section>
+
+      <section>
+        <h2>Animais disponíveis</h2>
+        @if (!s.animals.length) {
+          <p class="shelter__empty">Nenhum animal disponível no momento.</p>
+        } @else {
+          <div class="shelter__grid">
+            @for (animal of s.animals; track animal.id) {
+              <a class="mini-card" [routerLink]="['/adotante/animais', animal.id]">
+                <div class="mini-card__media">
+                  @if (animal.cover_photo_url) {
+                    <img [src]="animal.cover_photo_url" [alt]="animal.name" />
+                  } @else {
+                    <mat-icon>pets</mat-icon>
+                  }
+                  <app-status-badge [status]="animal.status" />
+                </div>
+                <div class="mini-card__title">
+                  <strong>{{ animal.name }}</strong>
+                  <span class="mini-card__age">{{ animal.age_text || '—' }}</span>
+                </div>
+                <span>{{ breedSexLine(animal.breed, animal.sex) }}</span>
+              </a>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+}

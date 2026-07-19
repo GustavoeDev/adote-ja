@@ -1,0 +1,202 @@
+@if (loading()) {
+  <div class="profile-loading"><mat-spinner diameter="40"></mat-spinner></div>
+} @else if (profile(); as p) {
+  <div class="profile">
+    <header class="profile__header">
+      <div class="profile__identity">
+        <div class="profile__avatar">{{ p.initials }}</div>
+        <div>
+          <h1>{{ p.name || 'Adotante' }}</h1>
+          <p>{{ p.email }}</p>
+          <span class="profile__active"><mat-icon>check</mat-icon> Conta ativa</span>
+        </div>
+      </div>
+      @if (!editMode()) {
+        <button type="button" class="profile__edit" (click)="startEdit()" aria-label="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+      } @else {
+        <button mat-flat-button color="primary" [disabled]="saving()" (click)="save()">Salvar</button>
+      }
+    </header>
+
+    <mat-tab-group animationDuration="200ms" class="profile__tabs">
+      <mat-tab label="Dados Pessoais">
+        <div class="tab-panel" [formGroup]="form">
+          @if (editMode()) {
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Nome completo</mat-label>
+              <input matInput formControlName="name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Telefone</mat-label>
+              <input
+                matInput
+                type="tel"
+                formControlName="phone"
+                placeholder="(11) 99999-9999"
+                inputmode="numeric"
+                maxlength="15"
+                (input)="onPhoneInput($event)"
+              />
+              @if (form.controls.phone.touched && form.controls.phone.hasError('invalidPhone')) {
+                <mat-error>Informe um telefone válido</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>CPF</mat-label>
+              <input
+                matInput
+                formControlName="cpf"
+                placeholder="000.000.000-00"
+                inputmode="numeric"
+                maxlength="14"
+                (input)="onCpfInput($event)"
+              />
+              @if (form.controls.cpf.touched && form.controls.cpf.hasError('invalidCpf')) {
+                <mat-error>CPF inválido</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Data de nascimento</mat-label>
+              <input
+                matInput
+                formControlName="birthdate"
+                placeholder="dd/mm/aaaa"
+                inputmode="numeric"
+                maxlength="10"
+                (input)="onBirthdateInput($event)"
+              />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Endereço</mat-label>
+              <input matInput formControlName="address" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Cidade / Estado</mat-label>
+              <input matInput formControlName="city" />
+            </mat-form-field>
+          } @else {
+            <div class="read-card">
+              <div class="read-row"><span>Nome completo</span><strong>{{ p.name || '—' }}</strong></div>
+              <div class="read-row"><span>Telefone</span><strong>{{ p.phone || '—' }}</strong></div>
+              <div class="read-row"><span>CPF</span><strong>{{ p.cpf || '—' }}</strong></div>
+              <div class="read-row"><span>Data de nascimento</span><strong>{{ p.birthdate || '—' }}</strong></div>
+              <div class="read-row"><span>Endereço</span><strong>{{ p.address || '—' }}</strong></div>
+              <div class="read-row"><span>Cidade / Estado</span><strong>{{ p.city || '—' }}</strong></div>
+            </div>
+          }
+
+          <div class="profile__actions">
+            <button type="button" class="action-btn" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Sair da conta
+            </button>
+            <button type="button" class="action-btn action-btn--danger" (click)="openDeleteDialog()">
+              <mat-icon>delete</mat-icon>
+              Excluir minha conta
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Meu Lar">
+        <div class="tab-panel" [formGroup]="form">
+          <p class="hint">
+            Estas informações agilizam o processo de adoção e são compartilhadas com os abrigos automaticamente.
+          </p>
+          @if (editMode()) {
+            <p class="field-label">Tipo de moradia</p>
+            <div class="choice-grid">
+              @for (t of housingTypes; track t) {
+                <button
+                  type="button"
+                  class="choice"
+                  [class.choice--active]="form.controls.housing_type.value === t"
+                  (click)="setChoice('housing_type', t)"
+                >
+                  {{ t }}
+                </button>
+              }
+            </div>
+            <p class="field-label">Tem telas nas janelas?</p>
+            <div class="choice-row">
+              @for (v of ['Sim', 'Não']; track v) {
+                <button
+                  type="button"
+                  class="choice"
+                  [class.choice--active]="form.controls.has_screens.value === v"
+                  (click)="setChoice('has_screens', v)"
+                >
+                  {{ v }}
+                </button>
+              }
+            </div>
+            <p class="field-label">Tem quintal?</p>
+            <div class="choice-row">
+              @for (v of ['Sim', 'Não']; track v) {
+                <button
+                  type="button"
+                  class="choice"
+                  [class.choice--active]="form.controls.has_yard.value === v"
+                  (click)="setChoice('has_yard', v)"
+                >
+                  {{ v }}
+                </button>
+              }
+            </div>
+            <mat-form-field appearance="outline" class="full">
+              <mat-label>Outros animais em casa?</mat-label>
+              <input matInput formControlName="other_pets" />
+            </mat-form-field>
+            <p class="field-label">Horas que o pet ficará sozinho</p>
+            <div class="choice-grid choice-grid--3">
+              @for (h of hoursOptions; track h) {
+                <button
+                  type="button"
+                  class="choice"
+                  [class.choice--active]="form.controls.hours_alone.value === h"
+                  (click)="setChoice('hours_alone', h)"
+                >
+                  {{ h }}
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="read-card">
+              <div class="read-row"><span>Tipo de moradia</span><strong>{{ p.housing_type || '—' }}</strong></div>
+              <div class="read-row"><span>Telas nas janelas</span><strong>{{ p.has_screens || '—' }}</strong></div>
+              <div class="read-row"><span>Quintal / área externa</span><strong>{{ p.has_yard || '—' }}</strong></div>
+              <div class="read-row"><span>Outros animais</span><strong>{{ p.other_pets || '—' }}</strong></div>
+              <div class="read-row"><span>Horas sozinho por dia</span><strong>{{ p.hours_alone || '—' }}</strong></div>
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Preferências">
+        <div class="tab-panel">
+          <p class="hint">Selecione o que você procura para receber sugestões personalizadas.</p>
+          <div class="prefs">
+            @for (opt of prefOptions; track opt) {
+              <button
+                type="button"
+                class="pref-chip"
+                [class.pref-chip--active]="prefs().includes(opt)"
+                (click)="togglePref(opt)"
+              >
+                {{ opt }}
+              </button>
+            }
+          </div>
+          @if (prefs().length) {
+            <div class="prefs-summary">
+              <span>Você procura:</span>
+              <strong>{{ prefs().join(', ') }}</strong>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+}

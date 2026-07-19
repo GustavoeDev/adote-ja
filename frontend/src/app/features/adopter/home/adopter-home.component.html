@@ -1,0 +1,106 @@
+<div class="home">
+  <header class="home__header">
+    <div>
+      <p class="home__welcome">Bem-vindo!</p>
+      <h1 class="home__title">Encontre seu pet</h1>
+    </div>
+
+    <div class="home__search-row">
+      <label class="home__search">
+        <mat-icon>search</mat-icon>
+        <input
+          type="search"
+          placeholder="Buscar por nome ou raça..."
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+        />
+      </label>
+
+      @if (cities().length) {
+        <div class="home__city-filter">
+          <button
+            type="button"
+            class="chip city-trigger"
+            [class.chip--active]="!!activeCity()"
+            [matMenuTriggerFor]="cityMenu"
+          >
+            <mat-icon>location_on</mat-icon>
+            <span class="city-trigger__label">{{ cityLabel() }}</span>
+            <mat-icon class="city-trigger__chevron">expand_more</mat-icon>
+          </button>
+          <mat-menu #cityMenu="matMenu" class="city-menu">
+            <button mat-menu-item type="button" (click)="setCity('')">
+              <mat-icon>public</mat-icon>
+              <span>Todas as cidades</span>
+            </button>
+            @for (city of cities(); track city) {
+              <button mat-menu-item type="button" (click)="setCity(city)">
+                <mat-icon>location_on</mat-icon>
+                <span>{{ city }}</span>
+              </button>
+            }
+          </mat-menu>
+        </div>
+      }
+    </div>
+
+    <div class="home__chips" role="tablist" aria-label="Filtrar por espécie">
+      @for (f of filters; track f.id) {
+        <button
+          type="button"
+          class="chip"
+          [class.chip--active]="activeFilter() === f.id"
+          (click)="setFilter(f.id)"
+        >
+          <mat-icon>{{ f.icon }}</mat-icon>
+          {{ f.label }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="home__loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <p class="home__count">{{ filtered().length }} animais encontrados</p>
+
+    @if (filtered().length === 0) {
+      <div class="home__empty">
+        <mat-icon>pets</mat-icon>
+        <p>Nenhum animal encontrado</p>
+      </div>
+    } @else {
+      <div class="home__grid">
+        @for (animal of filtered(); track animal.id) {
+          <button type="button" class="animal-card" (click)="openAnimal(animal.id)">
+            <div class="animal-card__media">
+              @if (animal.cover_photo_url) {
+                <img [src]="animal.cover_photo_url" [alt]="animal.name" loading="lazy" />
+              } @else {
+                <div class="animal-card__placeholder"><mat-icon>pets</mat-icon></div>
+              }
+              <div class="animal-card__badge">
+                <app-status-badge [status]="animal.status" />
+              </div>
+            </div>
+            <div class="animal-card__body">
+              <div class="animal-card__row">
+                <h3>
+                  {{ animal.name }}
+                  <span class="animal-card__age">{{ animal.age_text || '—' }}</span>
+                </h3>
+              </div>
+              <p>{{ breedSexLine(animal.breed, animal.sex) }}</p>
+              <p class="animal-card__city">
+                <mat-icon>location_on</mat-icon>
+                {{ animal.city || 'Cidade não informada' }}
+              </p>
+            </div>
+          </button>
+        }
+      </div>
+    }
+  }
+</div>

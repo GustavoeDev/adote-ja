@@ -1,0 +1,273 @@
+<div class="requests-page">
+  <header class="requests-page__header">
+    <h1>Solicitações</h1>
+    <p>Gerencie os pedidos de adoção do seu abrigo</p>
+  </header>
+
+  <div class="filters" role="tablist" aria-label="Filtrar por status">
+    @for (item of filters; track item.id) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="filter() === item.id"
+        (click)="setFilter(item.id)"
+      >
+        {{ item.label }}
+        <span class="filter-chip__count">{{ counts()[item.id] }}</span>
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="requests-page__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (filteredRequests().length === 0) {
+    <div class="requests-page__empty">
+      <mat-icon>assignment</mat-icon>
+      <p>Nenhuma solicitação encontrada</p>
+    </div>
+  } @else {
+    <ul class="requests__list">
+      @for (req of filteredRequests(); track req.id) {
+        <li>
+          <button type="button" class="request-card" (click)="openDetail(req)">
+            <div class="request-card__thumb">
+              @if (req.animal_photo_url) {
+                <img [src]="req.animal_photo_url" [alt]="req.animal_name" />
+              } @else {
+                <mat-icon>pets</mat-icon>
+              }
+            </div>
+            <div class="request-card__body">
+              <div class="request-card__title">
+                <span class="request-card__name">{{ req.animal_name }}</span>
+                <span class="status-badge" [attr.data-status]="req.status">
+                  {{ statusLabel(req.status) }}
+                </span>
+              </div>
+              <p class="request-card__meta">
+                Adotante: <strong>{{ req.adopter_name }}</strong>
+              </p>
+              <p class="request-card__date">
+                <mat-icon>calendar_today</mat-icon>
+                {{ req.date }}
+              </p>
+            </div>
+            <mat-icon class="request-card__chevron">chevron_right</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>
+
+@if (selected(); as req) {
+  <div class="detail-backdrop" (click)="closeDetail()"></div>
+  <aside class="detail-panel" role="dialog" aria-label="Detalhes do pedido">
+    <header class="detail-panel__header">
+      <h2>Detalhes do Pedido</h2>
+      <button type="button" class="detail-panel__close" (click)="closeDetail()" aria-label="Fechar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <div class="detail-panel__content">
+      <div class="detail-animal">
+        <div class="detail-animal__thumb">
+          @if (req.animal_photo_url) {
+            <img [src]="req.animal_photo_url" [alt]="req.animal_name" />
+          } @else {
+            <mat-icon>pets</mat-icon>
+          }
+        </div>
+        <div>
+          <p class="detail-animal__label">Solicitação para</p>
+          <p class="detail-animal__name">{{ req.animal_name }}</p>
+          <span class="status-badge" [attr.data-status]="req.status">
+            {{ statusLabel(req.status) }}
+          </span>
+        </div>
+      </div>
+
+      <section class="detail-section">
+        <h3>Dados do Adotante</h3>
+        <ul class="detail-adopter">
+          <li>
+            <mat-icon>person</mat-icon>
+            <span>{{ req.adopter_name }}</span>
+          </li>
+          @if (req.adopter_phone) {
+            <li>
+              <mat-icon>phone</mat-icon>
+              <span>{{ req.adopter_phone }}</span>
+            </li>
+          }
+          <li>
+            <mat-icon>mail</mat-icon>
+            <span>{{ req.adopter_email }}</span>
+          </li>
+          @if (req.adopter_city) {
+            <li>
+              <mat-icon>location_on</mat-icon>
+              <span>{{ req.adopter_city }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="detail-section">
+        <h3>Linha do tempo</h3>
+        <ol class="timeline">
+          @for (item of req.timeline; track item.order; let last = $last) {
+            <li class="timeline__item" [attr.data-status]="item.status">
+              <div class="timeline__rail">
+                <span class="timeline__dot">
+                  @if (item.status === 'done') {
+                    <mat-icon>check</mat-icon>
+                  } @else if (item.status === 'current') {
+                    <mat-icon>schedule</mat-icon>
+                  }
+                </span>
+                @if (!last) {
+                  <span class="timeline__line"></span>
+                }
+              </div>
+              <div class="timeline__body">
+                <p class="timeline__event">{{ item.event }}</p>
+                <p class="timeline__date">{{ item.date_text }}</p>
+              </div>
+            </li>
+          }
+        </ol>
+      </section>
+
+      @if (req.rejection_reason) {
+        <section class="detail-section">
+          <h3>Motivo da rejeição</h3>
+          <p class="rejection-reason">{{ req.rejection_reason }}</p>
+        </section>
+      }
+
+      @if (req.can_review_data) {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Analise o formulário completo enviado pelo adotante antes de seguir para a entrevista.
+          </p>
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="openDataReview()"
+          >
+            <mat-icon>description</mat-icon>
+            Ver dados da solicitação
+          </button>
+        </div>
+      }
+
+      @if (req.data_reviewed && req.status === 'pending' && req.interview_phase === 'to_schedule') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Cadastro aprovado. Entre em contato pelo WhatsApp para combinar a entrevista e, em
+            seguida, confirme o agendamento.
+          </p>
+          @if (req.whatsapp_url) {
+            <button
+              mat-flat-button
+              type="button"
+              class="detail-actions__whatsapp"
+              (click)="openWhatsApp(req.whatsapp_url)"
+            >
+              <mat-icon>chat</mat-icon>
+              Agendar via WhatsApp
+            </button>
+          }
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="scheduleInterview()"
+          >
+            <mat-icon>event_available</mat-icon>
+            Entrevista agendada
+          </button>
+        </div>
+      }
+
+      @if (req.interview_phase === 'scheduled') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Entrevista agendada. Em seguida, registre quando ela for realizada.
+          </p>
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="startInterview()"
+          >
+            <mat-icon>arrow_forward</mat-icon>
+            Ir para realização
+          </button>
+        </div>
+      }
+
+      @if (req.interview_phase === 'to_perform') {
+        <div class="detail-step-actions">
+          <p class="detail-step-actions__hint">
+            Após realizar a entrevista, registre aqui para liberar a decisão final.
+          </p>
+          @if (req.whatsapp_url) {
+            <button
+              mat-stroked-button
+              type="button"
+              class="detail-actions__whatsapp-outline"
+              (click)="openWhatsApp(req.whatsapp_url)"
+            >
+              <mat-icon>chat</mat-icon>
+              WhatsApp do adotante
+            </button>
+          }
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="completeInterview()"
+          >
+            <mat-icon>handshake</mat-icon>
+            Entrevista realizada
+          </button>
+        </div>
+      }
+
+      @if (req.can_decide) {
+        <div class="detail-actions">
+          <button
+            mat-stroked-button
+            type="button"
+            class="detail-actions__reject"
+            [disabled]="acting()"
+            (click)="reject()"
+          >
+            <mat-icon>cancel</mat-icon>
+            Recusar
+          </button>
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            [disabled]="acting()"
+            (click)="approve()"
+          >
+            <mat-icon>check_circle</mat-icon>
+            Aprovar
+          </button>
+        </div>
+      }
+    </div>
+  </aside>
+}

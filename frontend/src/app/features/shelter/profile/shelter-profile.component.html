@@ -1,0 +1,252 @@
+@if (loading()) {
+  <div class="profile-loading">
+    <mat-spinner diameter="36"></mat-spinner>
+  </div>
+} @else if (profile(); as p) {
+  <div class="profile">
+    <div class="profile__cover-wrap">
+      @if (editMode()) {
+        <div
+          class="profile__cover profile__cover--editable"
+          [class.profile__cover--dragging]="dragging()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="coverInput.click()"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="coverInput.click()"
+        >
+          @if (coverPreview()) {
+            <img [src]="coverPreview()!" alt="Capa do abrigo" />
+          } @else {
+            <div class="profile__cover-placeholder"></div>
+          }
+          <div class="profile__cover-overlay">
+            <mat-icon>photo_camera</mat-icon>
+            <span>Clique ou arraste para trocar</span>
+          </div>
+          <input
+            #coverInput
+            type="file"
+            accept="image/*"
+            hidden
+            (change)="onCoverInput($event)"
+          />
+        </div>
+      } @else {
+        <div class="profile__cover">
+          @if (coverPreview()) {
+            <img [src]="coverPreview()!" alt="Capa do abrigo" />
+          } @else {
+            <div class="profile__cover-placeholder"></div>
+          }
+          <div class="profile__cover-gradient"></div>
+        </div>
+      }
+
+      <div
+        class="profile__avatar"
+        [class.profile__avatar--editable]="editMode()"
+        (click)="editMode() && avatarInput.click()"
+        role="button"
+        [attr.tabindex]="editMode() ? 0 : null"
+        [attr.aria-label]="editMode() ? 'Trocar foto de perfil' : null"
+        (keydown.enter)="editMode() && avatarInput.click()"
+      >
+        @if (avatarPreview()) {
+          <img [src]="avatarPreview()!" [alt]="'Foto de ' + p.name" />
+        } @else {
+          <span>{{ p.initials }}</span>
+        }
+        @if (editMode()) {
+          <span class="profile__avatar-overlay">
+            <mat-icon>photo_camera</mat-icon>
+          </span>
+        }
+        <input
+          #avatarInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onAvatarInput($event)"
+          (click)="$event.stopPropagation()"
+        />
+      </div>
+
+      <div class="profile__cover-actions">
+        @if (editMode()) {
+          <button type="button" class="profile__cancel-btn" (click)="cancelEdit()" [disabled]="saving()">
+            <mat-icon>close</mat-icon>
+            Cancelar
+          </button>
+          <button class="btn-primary profile__save-btn" type="button" (click)="save()" [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              <mat-icon>save</mat-icon>
+              Salvar
+            }
+          </button>
+        } @else {
+          <button type="button" class="btn-primary profile__edit-btn" (click)="startEdit()">
+            <mat-icon>edit</mat-icon>
+            Editar perfil
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="profile__identity">
+      <h1>{{ editMode() ? form.controls.name.value || p.name : p.name }}</h1>
+      @if (p.is_verified) {
+        <span class="profile__verified">
+          <mat-icon>verified</mat-icon>
+          Conta Verificada
+        </span>
+      }
+    </div>
+
+    <div class="profile__tabs" role="tablist">
+      <button
+        type="button"
+        class="profile__tab"
+        [class.profile__tab--active]="activeTab() === 0"
+        (click)="setTab(0)"
+      >
+        Sobre nós
+      </button>
+      <button
+        type="button"
+        class="profile__tab"
+        [class.profile__tab--active]="activeTab() === 1"
+        (click)="setTab(1)"
+      >
+        Animais ({{ animals().length }})
+      </button>
+    </div>
+
+    <div class="profile__content">
+      @if (activeTab() === 0) {
+        @if (editMode()) {
+          <form class="profile__edit-form" [formGroup]="form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nome do abrigo</mat-label>
+              <input matInput formControlName="name" />
+              @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+                <mat-error>Nome é obrigatório</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Sobre o abrigo</mat-label>
+              <textarea matInput formControlName="about" rows="4"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Telefone</mat-label>
+              <input
+                matInput
+                type="tel"
+                formControlName="public_phone"
+                placeholder="(11) 99999-9999"
+                inputmode="numeric"
+                maxlength="15"
+                (input)="onPhoneInput($event)"
+              />
+              @if (form.controls.public_phone.touched && form.controls.public_phone.hasError('invalidPhone')) {
+                <mat-error>Informe um telefone válido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>E-mail público</mat-label>
+              <input matInput type="email" formControlName="public_email" placeholder="contato@abrigo.org" />
+              @if (form.controls.public_email.hasError('email') && form.controls.public_email.touched) {
+                <mat-error>Informe um e-mail válido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Website</mat-label>
+              <input matInput formControlName="website" placeholder="www.seuabrigo.org.br" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Cidade / Estado</mat-label>
+              <input matInput formControlName="city" placeholder="São Paulo, SP" />
+            </mat-form-field>
+          </form>
+        } @else {
+          <div class="surface-card profile__about-card">
+            <h3>Sobre nós</h3>
+            <p>{{ p.about || 'Nenhuma descrição cadastrada ainda.' }}</p>
+          </div>
+
+          <div class="surface-card profile__contacts">
+            @if (p.public_phone) {
+              <div class="profile__contact">
+                <div class="profile__contact-icon"><mat-icon>phone</mat-icon></div>
+                <span>{{ p.public_phone }}</span>
+              </div>
+            }
+            @if (p.public_email) {
+              <div class="profile__contact">
+                <div class="profile__contact-icon"><mat-icon>mail</mat-icon></div>
+                <span>{{ p.public_email }}</span>
+              </div>
+            }
+            @if (p.website) {
+              <div class="profile__contact">
+                <div class="profile__contact-icon"><mat-icon>language</mat-icon></div>
+                <a [href]="p.website" target="_blank" rel="noopener noreferrer">
+                  {{ displayWebsite(p.website) }}
+                </a>
+              </div>
+            }
+            @if (p.city) {
+              <div class="profile__contact">
+                <div class="profile__contact-icon"><mat-icon>location_on</mat-icon></div>
+                <span>{{ p.city }}</span>
+              </div>
+            }
+            @if (!p.public_phone && !p.public_email && !p.website && !p.city) {
+              <p class="profile__empty-contacts">Nenhum contato cadastrado.</p>
+            }
+          </div>
+        }
+      } @else {
+        @if (animals().length === 0) {
+          <div class="profile__animals-empty">
+            <mat-icon>pets</mat-icon>
+            <p>Nenhum animal cadastrado</p>
+          </div>
+        } @else {
+          <div class="profile__animals-grid">
+            @for (animal of animals(); track animal.id) {
+              <button type="button" class="animal-card" (click)="editAnimal(animal)">
+                <div class="animal-card__media">
+                  @if (animal.cover_photo_url) {
+                    <img [src]="animal.cover_photo_url" [alt]="animal.name" />
+                  } @else {
+                    <div class="animal-card__placeholder"><mat-icon>pets</mat-icon></div>
+                  }
+                  <div class="animal-card__badge">
+                    <app-status-badge [status]="animal.status" />
+                  </div>
+                  <div class="animal-card__edit">
+                    <mat-icon>edit</mat-icon>
+                  </div>
+                </div>
+                <div class="animal-card__body">
+                  <h3>{{ animal.name }}</h3>
+                  <p>{{ breedLabel(animal.breed) }}</p>
+                </div>
+              </button>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+}

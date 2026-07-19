@@ -1,0 +1,73 @@
+<div class="requests">
+  <header class="requests__header">
+    <h1>Minhas Solicitações</h1>
+    <p>Acompanhe o andamento das suas adoções</p>
+  </header>
+
+  @if (loading()) {
+    <div class="requests__loading"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else if (requests().length === 0) {
+    <div class="requests__empty">
+      <mat-icon>assignment</mat-icon>
+      <p>Você ainda não enviou solicitações.</p>
+    </div>
+  } @else {
+    <div class="requests__list">
+      @for (req of requests(); track req.id) {
+        <article class="request-card">
+          <button type="button" class="request-card__head" (click)="toggle(req.id)">
+            @if (req.animal_photo_url) {
+              <img [src]="req.animal_photo_url" [alt]="req.animal_name" />
+            } @else {
+              <div class="request-card__photo-fallback"><mat-icon>pets</mat-icon></div>
+            }
+            <div class="request-card__meta">
+              <div class="request-card__row">
+                <h3>{{ req.animal_name }}</h3>
+                <span class="status-badge" [attr.data-status]="req.status">
+                  {{ statusLabel(req.status) }}
+                </span>
+              </div>
+              <p>
+                <mat-icon>calendar_today</mat-icon>
+                Enviado em {{ req.date }}
+              </p>
+            </div>
+            <mat-icon class="request-card__chevron" [class.request-card__chevron--open]="expandedId() === req.id">
+              expand_more
+            </mat-icon>
+          </button>
+
+          @if (expandedId() === req.id) {
+            <div class="request-card__timeline">
+              <p class="timeline-label">Linha do tempo</p>
+              @for (item of req.timeline; track item.order; let last = $last) {
+                <div class="timeline-item" [attr.data-status]="item.status">
+                  <div class="timeline-item__rail">
+                    <div class="timeline-item__dot">
+                      @if (item.status === 'done') {
+                        <mat-icon>check</mat-icon>
+                      } @else if (item.status === 'current') {
+                        <mat-icon>schedule</mat-icon>
+                      }
+                    </div>
+                    @if (!last) {
+                      <div class="timeline-item__line"></div>
+                    }
+                  </div>
+                  <div class="timeline-item__content">
+                    <strong>{{ item.event }}</strong>
+                    <span>{{ item.date_text }}</span>
+                  </div>
+                </div>
+              }
+              @if (req.rejection_reason) {
+                <p class="rejection">Motivo: {{ req.rejection_reason }}</p>
+              }
+            </div>
+          }
+        </article>
+      }
+    </div>
+  }
+</div>
